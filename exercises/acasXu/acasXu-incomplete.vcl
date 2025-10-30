@@ -297,8 +297,8 @@ verticalSeparationLarge x =
   0 <= x ! intruderSpeed  <= 1200
 
 @property
-property6 : Bool
-property6 = forall x .
+property7 : Bool
+property7 = forall x .
   validInput x and verticalSeparationLarge x =>
   not (minimalScore strongLeft x) and not (minimalScore strongRight x)
 
@@ -315,8 +315,26 @@ property6 = forall x .
 -- – Desired output property: the score for “weak left” is minimal or the score
 -- for COC is minimal.
 
--- Ideas for previous "weak left"
--- 
+-- previous is much simpler than I originally thought, can just use the indexing of the network
+-- source: https://easychair.org/publications/paper/mmSLW/open
+-- Each network is indexed by a pair λ,β where λis an integer denoting previous advisory aprev ∈{COC,WL,WR,SL,SR}
+
+largeVerticalSeparation : UnnormalisedInput -> Bool
+largeVerticalSeparation x =
+  0 <= x ! distanceToIntruder <= 60760
+  (−3.141592 <= x ! angleToIntruder <= -0.75) and
+  −0.1 <= x ! intruderHeading <= (-0.1) and
+  600 <= x ! speed >= 1200 and
+  0 <= x ! intruderSpeed  <= 1200
+
+  -- the testing for only when previous advice was "weak left" comes from indexing of neural net files
+
+@property
+property8 : Bool
+property8 = forall x .
+  validInput x and largeVerticalSeparation x =>
+    (minimalScore clearOfConflict x) or (minimalScore weakLeft x)
+
 
 
 --------------------------------------------------------------------------------
@@ -330,6 +348,21 @@ property6 = forall x .
 -- – Input constraints: 2000 ≤ρ ≤7000,−0.4 ≤θ ≤−0.14,−3.141592 ≤ψ ≤
 -- −3.141592 + 0.01, 100 ≤vown ≤150, 0 ≤vint ≤150.
 -- – Desired output property: the score for “strong left” is minimal.
+
+nearbyIntruder : UnnormalisedInput -> Bool
+nearbyIntruder x =
+  2000 <= x ! distanceToIntruder <= 7000
+  (-0.4 <= x ! angleToIntruder <= -0.14) and
+  −3.141592 <= x ! intruderHeading <= (−3.141592 + 0.01) and
+  100 <= x ! speed >= 150 and
+  0 <= x ! intruderSpeed  <= 150
+
+@property
+property9 : Bool
+property9 = forall x .
+  validInput x and nearbyIntruder x =>
+    (minimalScore strongLeft x)
+
 
 --------------------------------------------------------------------------------
 
