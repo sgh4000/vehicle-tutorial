@@ -108,7 +108,6 @@ normAcasXu x = acasXu (normalise x)
 advises : Index 5 -> UnnormalisedInput -> Bool
 advises i x = forall j . i != j => normAcasXu x ! i < normAcasXu x ! j
 
-
 --------------------------------------------------------------------------------
 -- Property 3 - Do it yourself!
 
@@ -117,11 +116,22 @@ advises i x = forall j . i != j => normAcasXu x ! i < normAcasXu x ! j
 
 -- Tested on: all networks except N_{1,7}, N_{1,8}, and N_{1,9}.
 
-directlyAhead : TODO
+directlyAhead : UnnormalisedInput -> Bool
+directlyAhead x = 
+  1500  <= x ! distanceToIntruder <= 1800 and
+  -0.06 <= x ! angleToIntruder    <= 0.06
 
 movingTowards : UnnormalisedInput -> Bool
-movingTowards x = TODO
+movingTowards x = 
+  x ! intruderHeading >= 3.10 and
+  x ! speed           >= 980  and
+  x ! intruderSpeed   >= 960 
+
 
 @property
 property3 : Bool
-property3 = TODO
+property3 = forall x .
+  validInput    x and
+  directlyAhead x and
+  movingTowards x 
+  => not(advises clearOfConflict x)
