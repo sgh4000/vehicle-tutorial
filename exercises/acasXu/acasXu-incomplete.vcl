@@ -110,18 +110,59 @@ advises i x = forall j . i != j => normAcasXu x ! i < normAcasXu x ! j
 
 
 --------------------------------------------------------------------------------
--- Property 3 - Do it yourself!
+-- Property 3
 
 -- If the intruder is directly ahead and is moving towards the
 -- ownship, the score for COC will not be minimal.
 
 -- Tested on: all networks except N_{1,7}, N_{1,8}, and N_{1,9}.
 
-directlyAhead : TODO
+directlyAhead : UnnormalisedInput -> Bool
+directlyAhead x =
+  1500  <= x ! distanceToIntruder <= 1800 and
+  -0.06 <= x ! angleToIntruder    <= 0.06
 
 movingTowards : UnnormalisedInput -> Bool
-movingTowards x = TODO
+movingTowards x =
+  x ! intruderHeading >= 3.10  and
+  x ! speed           >= 980   and
+  x ! intruderSpeed   >= 960
 
 @property
 property3 : Bool
-property3 = TODO
+property3 = forall x .
+  validInput x and directlyAhead x and movingTowards x =>
+  not (advises clearOfConflict x)
+
+
+--------------------------------------------------------------------------------
+-- Property 1
+
+-- If the intruder is distant and is significantly slower than the ownship, 
+-- the score of a COC advisory will always be below a certain fixed threshold.
+
+scale = (1500 - 7.518884)
+
+belowThreshold : Input -> Bool
+belowThreshold x = (acasXu x ! clearOfConflict) < ((1500-7.518884)/373.94992)
+
+
+distant : UnnormalisedInput -> Bool
+distant y = 
+  y ! distanceToIntruder >= 55947.691
+
+significantlySlower : UnnormalisedInput -> Bool
+significantlySlower y = 
+  y ! speed >= 1145 and
+  y ! intruderSpeed <= 60
+
+@property
+property1 : Bool
+property1 = forall y .
+  validInput y and distant y and significantlySlower y =>
+    belowThreshold y
+  
+--------------------------------------------------------------------------------
+
+
+
