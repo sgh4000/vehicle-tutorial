@@ -149,6 +149,25 @@ property1 = forall x .
   intruderIsSlow ownerVmin intruderVmax x  
   => (advisesThreshold clearOfConflict cocScoreThresh x)
 
+
+--------------------------------------------------------------------------------
+-- Property 2
+
+-- If the intruder is distant and 
+-- the intuder is significantly slower that the ownership
+-- the score of a COC advisory will never be maximal
+
+adviseMaximal : Index 5 -> UnnormalisedInput -> Bool
+adviseMaximal i x = forall j . i != j => normAcasXu x ! j < normAcasXu x ! i
+
+@property 
+property2 : Bool
+property2 = forall x.
+  validInput x and
+  intruderIsDistance disThresh x and 
+  intruderIsSlow ownerVmin intruderVmax x  
+  => not(adviseMaximal clearOfConflict x)
+
 --------------------------------------------------------------------------------
 -- Property 3
 
@@ -176,5 +195,6 @@ property3 = forall x .
   directlyAhead x and
   movingTowards x 
   => not(advises clearOfConflict x)
+
 
 
