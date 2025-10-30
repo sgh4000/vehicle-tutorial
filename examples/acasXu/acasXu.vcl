@@ -112,6 +112,7 @@ advises i x = forall j . i != j => normAcasXu x ! i < normAcasXu x ! j
 
 --------------------------------------------------------------------------------
 -- Property 3
+-- Test
 
 -- If the intruder is directly ahead and is moving towards the
 -- ownship, the score for COC will not be minimal.
