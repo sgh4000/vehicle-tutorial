@@ -105,43 +105,29 @@ normAcasXu x = acasXu (normalise x)
 -- A constraint that says the network chooses output `i` when given the
 -- input `x`. We must necessarily provide a finite index that is less than 5
 -- (i.e. of type Index 5). The `a ! b` operator lookups index `b` in vector `a`.
-advises : Index 5 -> UnnormalisedInput -> Bool
-advises i x = forall j . i != j => normAcasXu x ! i < normAcasXu x ! j
+minimalScore : Index 5 -> UnnormalisedInput -> Bool
+minimalScore i x = forall j . i != j => normAcasXu x ! i < normAcasXu x ! j
 
+maximalScore : Index 5 -> UnnormalisedInput -> Bool
+maximalScore i x =
+  forall j . i != j => normAcasXu x ! i > normAcasXu x ! j
+  
+--------------------------------------------------------------------------------
+
+-- Properties
 
 --------------------------------------------------------------------------------
--- Property 3
 
--- If the intruder is directly ahead and is moving towards the
--- ownship, the score for COC will not be minimal.
-
--- Tested on: all networks except N_{1,7}, N_{1,8}, and N_{1,9}.
-
-directlyAhead : UnnormalisedInput -> Bool
-directlyAhead x =
-  1500  <= x ! distanceToIntruder <= 1800 and
-  -0.06 <= x ! angleToIntruder    <= 0.06
-
-movingTowards : UnnormalisedInput -> Bool
-movingTowards x =
-  x ! intruderHeading >= 3.10  and
-  x ! speed           >= 980   and
-  x ! intruderSpeed   >= 960
-
-@property
-property3 : Bool
-property3 = forall x .
-  validInput x and directlyAhead x and movingTowards x =>
-  not (advises clearOfConflict x)
-
-
---------------------------------------------------------------------------------
 -- Property 1
 
--- If the intruder is distant and is significantly slower than the ownship, 
--- the score of a COC advisory will always be below a certain fixed threshold.
+-- Description: If the intruder is distant and is significantly slower than the
+-- ownship, the score of a COC advisory will always be below a certain fixed
+-- threshold.
+-- Tested on: all 45 networks.
+-- Input constraints: ρ≥55947.691, vown ≥1145, vint ≤60.
+-- Desired output property: the score for COC is at most 1500.
 
-scale = (1500 - 7.518884)
+scale = (1500 - 7.518884)/300
 
 belowThreshold : Input -> Bool
 belowThreshold x = (acasXu x ! clearOfConflict) < ((1500-7.518884)/373.94992)
@@ -161,8 +147,212 @@ property1 : Bool
 property1 = forall y .
   validInput y and distant y and significantlySlower y =>
     belowThreshold y
-  
+
+--------------------------------------------------------------------------------
+
+-- Property 2
+
+-- Description: If the intruder is distant and is significantly slower than the
+-- ownship, the score of a COC advisory will never be maximal.
+-- Tested on: Nx,y for all x≥2 and for all y.
+-- Input constraints: ρ≥55947.691, vown ≥1145, vint ≤60.
+-- Desired output property: the score for COC is not the maximal score.
+
+@property
+property2 : Bool
+property2 = forall x .
+  validInput x and distant x and significantlySlower x =>
+    not (maximalScore clearOfConflict x)
+
+
+--------------------------------------------------------------------------------
+
+-- Property 3
+
+-- Description: If the intruder is directly ahead and is moving towards the
+-- ownship, the score for COC will not be minimal.
+-- Tested on: all networks except N1,7, N1,8, and N1,9.
+-- Input constraints: 1500 ≤ρ≤1800,−0.06 ≤θ≤0.06, ψ≥3.10, vown ≥980,
+-- vint ≥960.
+-- Desired output property: the score for COC is not the minimal score.
+
+directlyAhead : UnnormalisedInput -> Bool
+directlyAhead x =
+  1500  <= x ! distanceToIntruder <= 1800 and
+  -0.06 <= x ! angleToIntruder    <= 0.06
+
+movingTowards : UnnormalisedInput -> Bool
+movingTowards x =
+  x ! intruderHeading >= 3.10  and
+  x ! speed           >= 980   and
+  x ! intruderSpeed   >= 960
+
+@property
+property3 : Bool
+property3 = forall x .
+  validInput x and directlyAhead x and movingTowards x =>
+  not (minimalScore clearOfConflict x)
+
+--------------------------------------------------------------------------------
+
+-- Property 4
+
+-- – Description: If the intruder is directly ahead and is moving away from the
+-- ownship but at a lower speed than that of the ownship, the score for COC
+-- will not be minimal.
+-- – Tested on: all networks except N1,7, N1,8, and N1,9.
+-- – Input constraints: 1500 ≤ρ≤1800,−0.06 ≤θ ≤0.06, ψ = 0, vown ≥1000,
+-- 700 ≤vint ≤800.
+-- – Desired output property: the score for COC is not the minimal score.
+
+movingAway : UnnormalisedInput -> Bool
+movingAway x =
+  1500  <= x ! distanceToIntruder <= 1800 and
+  -0.06 <= x ! angleToIntruder <= 0.06 and
+  x ! intruderHeading == 0  and
+  x ! speed >= 1000 and
+  700 <= x ! intruderSpeed  <= 800
+
+@property
+property4 : Bool
+property4 = forall x .
+  validInput x and directlyAhead x and movingAway x =>
+  not (minimalScore clearOfConflict x)
+
+
+--------------------------------------------------------------------------------
+
+-- Property 5
+
+-- – Description: If the intruder is near and approaching from the left, the network
+-- advises “strong right”.
+--  Tested on: N1,1.
+-- – Input constraints: 250 ≤ ρ ≤ 400, 0.2 ≤ θ ≤ 0.4,−3.141592 ≤ ψ ≤
+-- −3.141592 + 0.005, 100 ≤vown ≤400, 0 ≤vint ≤400.
+-- – Desired output property: the score for “strong right” is the minimal score.
+
+near : UnnormalisedInput -> Bool
+near x = 
+  250 <= x ! distanceToIntruder <= 400
+
+intruderApproachingFromLeft : UnnormalisedInput -> Bool
+intruderApproachingFromLeft x =
+  0.2 <= x ! angleToIntruder <= 0.4 and
+  -3.141592 <= x ! intruderHeading <= (−3.141592 + 0.005) and
+  100 <= x ! speed >= 400 and
+  0 <= x ! intruderSpeed  <= 400
+
+@property
+property5 : Bool
+property5 = forall x .
+  validInput x and near x and intruderApproachingFromLeft x =>
+  minimalScore clearOfConflict x
+
 --------------------------------------------------------------------------------
 
 
+-- Property 6
+
+-- – Description: If the intruder is suﬃciently far away, the network advises COC.
+-- – Tested on: N1,1.
+-- – Input constraints: 12000 ≤ρ≤62000, (0.7 ≤θ≤3.141592) ∨(−3.141592 ≤
+-- θ ≤ −0.7),−3.141592 ≤ ψ ≤ −3.141592 + 0.005, 100 ≤ vown ≤ 1200,
+-- 0 ≤vint ≤1200.
+-- – Desired output property: the score for COC is the minimal score.
+
+far : UnnormalisedInput -> Bool
+far x = 
+  12000 <= x ! distanceToIntruder <= 62000 
+  (0.7 <= x ! angleToIntruder <= 3.141592 or −3.141592 <= x ! angleToIntruder <= −0.7 ) and
+  -3.141592 <= x ! intruderHeading <= (−3.141592 + 0.005) and
+  100 <= x ! speed >= 12000 and
+  0 <= x ! intruderSpeed  <= 1200
+
+
+@property
+property6 : Bool
+property6 = forall x .
+  validInput x and far x =>
+  minimalScore clearOfConflict x
+
+
+--------------------------------------------------------------------------------
+
+-- Property 7
+
+-- Description: If vertical separation is large, the network will never advise a
+-- strong turn.
+-- – Tested on: N1,9.
+-- – Input constraints: 0 ≤ρ≤60760,−3.141592 ≤θ ≤3.141592,−3.141592 ≤
+-- ψ≤3.141592, 100 ≤vown ≤1200, 0 ≤vint ≤1200.
+-- – Desired output property: the scores for “strong right” and “strong left” are
+-- never the minimal scores.
+
+verticalSeparationLarge : UnnormalisedInput -> Bool
+verticalSeparationLarge x = 
+  0 <= x ! distanceToIntruder <= 60760
+  (−3.141592 <= x ! angleToIntruder <= 3.141592) and
+  −3.141592 <= x ! intruderHeading <= (3.141592) and
+  100 <= x ! speed >= 12000 and
+  0 <= x ! intruderSpeed  <= 1200
+
+@property
+property6 : Bool
+property6 = forall x .
+  validInput x and verticalSeparationLarge x =>
+  not (minimalScore strongLeft x) and not (minimalScore strongRight x)
+
+
+--------------------------------------------------------------------------------
+
+-- Property 8
+
+-- Description: For a large vertical separation and a previous “weak left” advi-
+-- sory, the network will either output COC or continue advising “weak left”.
+-- – Tested on: N2,9.
+-- – Input constraints: 0 ≤ρ≤60760,−3.141592 ≤θ≤−0.75·3.141592,−0.1 ≤
+-- ψ≤0.1, 600 ≤vown ≤1200, 600 ≤vint ≤1200.
+-- – Desired output property: the score for “weak left” is minimal or the score
+-- for COC is minimal.
+
+-- Ideas for previous "weak left"
+-- 
+
+
+--------------------------------------------------------------------------------
+
+-- Property 9
+
+-- Description: Even if the previous advisory was “weak right”, the presence of
+-- a nearby intruder will cause the network to output a “strong left” advisory
+-- instead.
+-- – Tested on: N3,3.
+-- – Input constraints: 2000 ≤ρ ≤7000,−0.4 ≤θ ≤−0.14,−3.141592 ≤ψ ≤
+-- −3.141592 + 0.01, 100 ≤vown ≤150, 0 ≤vint ≤150.
+-- – Desired output property: the score for “strong left” is minimal.
+
+--------------------------------------------------------------------------------
+
+-- Property 10
+
+-- Description: For a far away intruder, the network advises COC.
+--  Tested on: N4,5.
+-- – Input constraints: 36000 ≤ρ ≤60760, 0.7 ≤θ ≤3.141592,−3.141592 ≤
+-- ψ≤−3.141592 + 0.01, 900 ≤vown ≤1200, 600 ≤vint ≤1200.
+-- – Desired output property: the score for COC is minimal.
+
+farAwayIntruder : UnnormalisedInput -> Bool
+far x = 
+  36000 <= x ! distanceToIntruder <= 60760
+  (0.7 <= x ! angleToIntruder <= 3.141592) and
+  -3.141592 <= x ! intruderHeading <= (−3.141592 + 0.01) and
+  900 <= x ! speed >= 12000 and
+  600 <= x ! intruderSpeed  <= 1200
+
+
+@property
+property6 : Bool
+property6 = forall x .
+  validInput x and far x =>
+  minimalScore clearOfConflict x
 
