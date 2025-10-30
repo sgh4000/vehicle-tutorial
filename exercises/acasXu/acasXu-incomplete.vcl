@@ -115,18 +115,21 @@ advises i x = forall j . i != j => normAcasXu x ! i < normAcasXu x ! j
 -- the intuder is significantly slower that the ownership
 -- The score of COC advisary should be bellow a certain fixed threshold.
 
-@parameter
-disThresh : Real        -- distance threshold (problem space)    --parameter disThresh:55947.691
+-- @parameter
+-- disThresh : Real        -- distance threshold (problem space)    --parameter disThresh:55947.691
+disThresh = 55947.691
 
-@parameter
-ownerVmin : Real        -- minimum ownship speed                 --parameter ownerVmin:1145
+-- @parameter
+-- ownerVmin : Real        -- minimum ownship speed                 --parameter ownerVmin:1145
+ownerVmin = 1145
 
-@parameter
-intruderVmax : Real     -- maximum intruder speed                --parameter intruderVmax:60
+-- @parameter
+-- intruderVmax : Real     -- maximum intruder speed                --parameter intruderVmax:60
+intruderVmax = 60
 
-@parameter
-cocScoreThresh : Real   -- RAW (unscaled) score threshold        --parameter cocScoreThresh:1500
-
+-- @parameter
+-- cocScoreThresh : Real   -- RAW (unscaled) score threshold        --parameter cocScoreThresh:1500
+cocScoreThresh = 1500
 
 intruderIsDistance : Real -> UnnormalisedInput -> Bool
 intruderIsDistance disThresh_ x = 
@@ -171,8 +174,9 @@ property2 = forall x.
 --------------------------------------------------------------------------------
 -- Property 3
 
--- If the intruder is directly ahead and is moving towards the
--- ownship, the score for COC will not be minimal.
+-- If the intruder is directly ahead 
+-- and is moving towards the ownship
+-- the score for COC will not be minimal.
 
 -- Tested on: all networks except N_{1,7}, N_{1,8}, and N_{1,9}.
 
@@ -196,5 +200,89 @@ property3 = forall x .
   movingTowards x 
   => not(advises clearOfConflict x)
 
+--------------------------------------------------------------------------------
+-- Property 4
 
+-- If the intruder is directly ahead
+-- and is moving away from the ownship 
+-- but at a lower speed than that of the ownship
+-- the score for COC will not be minimal.
 
+movinfAway : UnnormalisedInput -> Bool
+movinfAway x = 
+  x ! intruderHeading == 0    and 
+  x ! speed           >= 980  and
+  x ! intruderSpeed   >= 960 
+
+@property
+property4 : Bool
+property4 = forall x . 
+  validInput x and
+  movinfAway x 
+  => not(advises clearOfConflict x)
+--------------------------------------------------------------------------------
+-- Property 5
+
+-- If the intruder is near
+-- and approaching from the left
+-- the score for “strong right” is the minimal score.
+
+intruderIsNear : UnnormalisedInput -> Bool
+intruderIsNear x = 
+  250 <= x ! distanceToIntruder <= 400
+
+intruderIsApprochFromLeft : UnnormalisedInput -> Bool
+intruderIsApprochFromLeft x = 
+  0.2  <= x ! angleToIntruder <= 0.4         and
+  -pi  <= x ! intruderHeading <= -pi + 0.005 and
+  100  <= x ! speed           <= 400         and
+  0    <= x ! intruderSpeed   <= 400 
+
+@property
+property5 : Bool
+property5 = forall x .
+  validInput x and 
+  intruderIsNear x and
+  intruderIsApprochFromLeft x
+  => advises strongLeft x
+--------------------------------------------------------------------------------
+-- Property 6
+
+-- If the intruder is sufficiently far away
+-- the network advises COC.
+
+intruderSufficientFar : UnnormalisedInput -> Bool
+intruderSufficientFar x = 
+  12000 <= x ! distanceToIntruder <= 62000     and
+  (
+    0.7 <= x ! angleToIntruder <= pi           or
+    -pi <= x ! angleToIntruder <= -0.7
+  )                                            and 
+  -pi   <= x ! intruderHeading <= -pi + 0.005  and
+  100   <= x ! speed           <= 1200         and
+  0     <= x ! intruderSpeed   <= 1200 
+
+@property
+property6 : Bool
+property6 = forall x .
+  intruderSufficientFar x
+  => advises clearOfConflict x
+--------------------------------------------------------------------------------
+-- Property 7
+
+-- If vertical separation is large
+-- the network will never advise a strong turn
+
+verticalSeprationIsLarge : UnnormalisedInput -> Bool
+verticalSeprationIsLarge x = 
+  0    <= x ! distanceToIntruder  <= 60760 and 
+  -pi  <= x ! angleToIntruder     <= pi    and
+  -pi  <= x ! intruderHeading     <= pi    and
+  100  <= x ! speed               <= 1200  and
+  0    <= x ! intruderSpeed       <= 1200 
+
+@property
+property7 : Bool
+property7 = forall x .
+  verticalSeprationIsLarge x
+  => not(advises strongLeft x) and not(advises strongRight x)
