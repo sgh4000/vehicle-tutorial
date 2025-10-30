@@ -265,6 +265,7 @@ intruderSufficientFar x =
 @property
 property6 : Bool
 property6 = forall x .
+  validInput x and
   intruderSufficientFar x
   => advises clearOfConflict x
 --------------------------------------------------------------------------------
@@ -284,5 +285,6 @@ verticalSeprationIsLarge x =
 @property
 property7 : Bool
 property7 = forall x .
+  validInput x and
   verticalSeprationIsLarge x
   => not(advises strongLeft x) and not(advises strongRight x)
