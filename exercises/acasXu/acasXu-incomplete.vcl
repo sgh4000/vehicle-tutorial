@@ -109,7 +109,48 @@ advises : Index 5 -> UnnormalisedInput -> Bool
 advises i x = forall j . i != j => normAcasXu x ! i < normAcasXu x ! j
 
 --------------------------------------------------------------------------------
--- Property 3 - Do it yourself!
+-- Property 1
+
+-- If the intruder is distance and 
+-- the intuder is significantly slower that the ownership
+-- The score of COC advisary should be bellow a certain fixed threshold.
+
+@parameter
+disThresh : Real        -- distance threshold (problem space)    --parameter disThresh:55947.691
+
+@parameter
+ownerVmin : Real        -- minimum ownship speed                 --parameter ownerVmin:1145
+
+@parameter
+intruderVmax : Real     -- maximum intruder speed                --parameter intruderVmax:60
+
+@parameter
+cocScoreThresh : Real   -- RAW (unscaled) score threshold        --parameter cocScoreThresh:1500
+
+
+intruderIsDistance : Real -> UnnormalisedInput -> Bool
+intruderIsDistance disThresh_ x = 
+  x ! distanceToIntruder >= disThresh_
+
+intruderIsSlow : Real -> Real -> UnnormalisedInput -> Bool
+intruderIsSlow ownerVmin_ intruderVmax_ x = 
+  x ! intruderSpeed <= ownerVmin_ and 
+  x ! speed >= intruderVmax_
+
+advisesThreshold : Index 5 -> Real -> UnnormalisedInput -> Bool
+advisesThreshold i cocScoreThresh_ x =
+  ((normAcasXu x ! i) * 373.94992) + 7.518884 <= cocScoreThresh_
+
+@property
+property1 : Bool
+property1 = forall x . 
+  validInput x and
+  intruderIsDistance disThresh x and
+  intruderIsSlow ownerVmin intruderVmax x  
+  => (advisesThreshold clearOfConflict cocScoreThresh x)
+
+--------------------------------------------------------------------------------
+-- Property 3
 
 -- If the intruder is directly ahead and is moving towards the
 -- ownship, the score for COC will not be minimal.
@@ -135,3 +176,5 @@ property3 = forall x .
   directlyAhead x and
   movingTowards x 
   => not(advises clearOfConflict x)
+
+
