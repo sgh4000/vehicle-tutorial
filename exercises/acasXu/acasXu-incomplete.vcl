@@ -287,3 +287,72 @@ property7 = forall x .
   validInput x and
   verticalSeprationIsLarge x
   => not(advises strongLeft x) and not(advises strongRight x)
+--------------------------------------------------------------------------------
+-- Property 8
+
+-- For a large vertical separation
+-- and a previous “weak left” advisory
+-- the network will either output COC or continue advising “weak left”.
+
+
+largeVerticalSeperation : UnnormalisedInput -> Bool
+largeVerticalSeperation x = 
+  0    <= x ! distanceToIntruder  <= 60760 and 
+  -pi  <= x ! angleToIntruder     <= -0.75 and
+  -0.1 <= x ! intruderHeading     <= 0.1   and
+  600  <= x ! speed               <= 1200  and
+  600  <= x ! intruderSpeed       <= 1200 
+
+--------------------------------- TODO ---------------------------------
+previousAdvisory : Index 5 -> unnormalisedInput -> Bool
+previousAdvisory i x = 
+  1.0 == 1.0  
+
+@property
+property8 : Bool
+property8 = forall x .
+  validInput x and
+  largeVerticalSeperation x and
+  previousAdvisory weakLeft x 
+  => (advises clearOfConflict x) or (advises weakLeft x)
+--------------------------------------------------------------------------------
+-- Property 9
+
+-- Even if the previous advisory was “weak right”
+-- the presence of a nearby intruder 
+-- the score for “strong left” is minimal.
+
+presenceNearbyIntruder : UnnormalisedInput -> Bool
+presenceNearbyIntruder x =
+  2000  <= x ! distanceToIntruder  <= 7000         and 
+  -0.4  <= x ! angleToIntruder     <= -0.14        and
+  -pi   <= x ! intruderHeading     <= (-pi + 0.01) and
+  100   <= x ! speed               <= 150          and
+  0     <= x ! intruderSpeed       <= 150 
+
+@property
+property9 : Bool
+property9 = forall x .
+  validInput x and
+  presenceNearbyIntruder x 
+  => advises strongLeft x
+--------------------------------------------------------------------------------
+-- Property 10
+
+-- For a far away intruder
+-- the score for COC is minimal.
+
+farAwayIntruder : UnnormalisedInput -> Bool
+farAwayIntruder x =
+  36000  <= x ! distanceToIntruder  <= 60760        and 
+  0.7    <= x ! angleToIntruder     <= pi           and
+  -pi    <= x ! intruderHeading     <= (-pi + 0.01) and
+  900    <= x ! speed               <= 1200         and
+  600    <= x ! intruderSpeed       <= 1200 
+
+@property
+property10 : Bool
+property10 = forall x .
+  validInput x and 
+  farAwayIntruder x 
+  => advises clearOfConflict x
