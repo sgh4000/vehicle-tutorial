@@ -3,7 +3,7 @@
 
 -- Define the type for our input images. Note that the input is two-dimensional
 
-type Image = -- [your answer here]
+type Image = Tensor Real [28, 28]
 
 -- We define the type of the output labels
 -- i.e a number between 0 and 9, one for each digit
@@ -13,7 +13,7 @@ type Label = Index 10
 -- Define a predicate that states that all the pixel values in a given image are in the range 0.0 to 1.0
 
 validImage : Image -> Bool
-validImage x = -- [your answer here]
+validImage x = forall i j . 0 <= x ! i ! j <= 1
 
 --------------------------------------------------------------------------------
 -- Network
@@ -27,7 +27,18 @@ classifier : Image -> Tensor Real [10]
 -- for label `i` is greater than the score of any other label `j`.
 
 advises : Image -> Label -> Bool
-advises x i = -- [your answer here]
+advises x i = forall j . j != i => classifier x ! i > classifier x ! j
+
+eta : Real
+eta = 0.8
+
+--------------------------------------------------------------------------------
+
+-- Creating a strong advises for the strong classifier robustness
+
+strongAdvises : Image -> Label -> Bool
+strongAdvises x i =
+  forall j . j != i => classifier x ! i >= classifier x ! j + eta
 
 --------------------------------------------------------------------------------
 -- Definition of robustness around a point
@@ -43,13 +54,20 @@ epsilon : Real
 boundedByEpsilon : Image -> Bool
 boundedByEpsilon x = forall i j . -epsilon <= x ! i ! j <= epsilon
 
+
 -- We now define what it means for the network to be robust around an image `x`  that should be classified as `y`. Namely, that for any perturbation no greater than epsilon then if the perturbed image is still a valid image then the network should still advise label `y` for the perturbed version of `x`.
 
 robustAround : Image -> Label -> Bool
 robustAround image label = forall pertubation .
   let perturbedImage = image - pertubation in
   boundedByEpsilon pertubation and validImage perturbedImage =>
-    -- [your answer here]
+    advises perturbedImage label
+
+strongClassificationRobustAround : Image -> Label -> Bool
+strongClassificationRobustAround image label = forall pertubation .
+  let perturbedImage = image - pertubation in
+  boundedByEpsilon pertubation and validImage perturbedImage =>
+    strongAdvises perturbedImage label
 
 --------------------------------------------------------------------------------
 -- Robustness with respect to a dataset
@@ -89,4 +107,25 @@ trainingLabels : Vector Label n
 
 @property
 robust : Vector Bool n
-robust = foreach i . -- [your answer here]
+robust = foreach i . robustAround (trainingImages ! i) (trainingLabels ! i)
+
+-- Strong classification robustness
+
+epsilonStrong : Real
+epsilonStrong = 0.005
+
+
+@property
+strongClassificationRobust : Vector Bool n
+strongClassificationRobust = foreach i . strongClassificationRobustAround (trainingImages ! i) (trainingLabels ! i)
+
+
+
+
+--- Exploring other definitions of robustness
+
+-- Lipschitz robustness asserts that the distance between
+-- the original output and the perturbed output is at most a constant Ltimes the change in
+-- the distance between the inputs.
+
+
