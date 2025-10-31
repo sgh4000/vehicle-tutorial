@@ -1,4 +1,17 @@
 --------------------------------------------------------------------------------
+-- Notes to be considered
+
+-- It's not working with this function. The only difference is the virginica score, which I gave it to the function
+-- isVirginica : Input -> Bool
+-- isVirginica x =
+--     let scores = iris x in
+--     forall d . d != virginica => scores ! virginica > scores ! d
+
+-- A => B is equivalent to not A or B. With exists x, this becomes:
+-- exists x . (not (validInput x)) or (…contradiction…)
+-- Vehicle/Marabou can satisfy this just by picking an invalid x. But when x is invalid, the validInput 
+-- bounds don’t apply, so many inputs have no lower/upper bound → Marabou error: “have N infinite bounds.”
+--------------------------------------------------------------------------------
 -- Inputs
 
 -- define a new name for the type of inputs of the network.
@@ -48,8 +61,8 @@ normalPetalWidth x = 0.1 <= x ! petalWidth <= 2.5
 validInput : Input -> Bool
 validInput x = normalSepalLength x and normalSepalWidth x
     and normalPetalLength x and normalPetalWidth x
-    and x ! sepalLength > x ! sepalWidth
-    and x ! petalLength > x ! petalWidth
+    and x ! sepalLength >= x ! sepalWidth
+    and x ! petalLength >= x ! petalWidth
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -59,8 +72,8 @@ validInput x = normalSepalLength x and normalSepalWidth x
 
 @property
 property0 : Bool
-property0 = exists x . validInput x =>
-    ((iris x ! versicolor <= 0) and (iris x ! versicolor > 0))
+property0 = exists x . validInput x and
+    ((iris x ! versicolor <= 0) and (iris x ! versicolor >= 0))
 
 --------------------------------------------------------------------------------
 -- Property 1
@@ -72,15 +85,15 @@ slAndSw : Input -> Bool
 slAndSw x =
     1.3  <= x ! sepalLength - x ! sepalWidth <= 1.5
 
-isSetosa : Input -> Bool
-isSetosa x =
+isMax : Index 3 -> Input -> Bool
+isMax i x = 
     let scores = iris x in
-    forall d . d != setosa => scores ! setosa > scores ! d
+    forall d . d != i => scores ! i >= scores ! d
 
 @property
 property1 : Bool
-property1 = forall x . validInput x and slAndSw x and x ! sepalWidth > 3 =>
-    isSetosa x
+property1 = forall x . validInput x and slAndSw x and x ! sepalWidth >= 3 =>
+    isMax setosa x
 
 --------------------------------------------------------------------------------
 -- Property 2
@@ -96,7 +109,7 @@ slAndPl x =
 @property
 property2 : Bool
 property2 = forall x . validInput x and slAndPl x =>
-    isSetosa x
+    isMax setosa x
 
 --------------------------------------------------------------------------------
 -- Property 3
@@ -112,27 +125,22 @@ slAndPw x =
 @property
 property3 : Bool
 property3 = forall x . validInput x and slAndPw x =>
-    isSetosa x
+    isMax setosa x
 
 --------------------------------------------------------------------------------
 -- Property 4
 
 -- If the sepal length (sl) is longer than 7.5,
 -- then it is virginica
-
+    
 longSl : Input -> Bool
 longSl x =
     x ! sepalLength >= 7.5
 
-isVirginica : Input -> Bool
-isVirginica x =
-    let scores = iris x in
-    forall d . d != virginica => scores ! virginica > scores ! d
-
 @property
 property4 : Bool
 property4 = forall x . validInput x and longSl x =>
-    isVirginica x
+    isMax virginica x
 
 --------------------------------------------------------------------------------
 -- Property 5
@@ -140,14 +148,20 @@ property4 = forall x . validInput x and longSl x =>
 -- If the petal length is shorter than 2 and the petal width is shorter than 0.5,
 -- then it is setosa
 
+-- It's not working with this function. The only difference is the setosa score, which I gave it to the function
+-- isSetosa: Input -> Bool
+-- isSetosa x =
+--     let scores = iris x in
+--     forall d . d != setosa => scores ! setosa >= scores ! d
+
 smallPetal : Input -> Bool
 smallPetal x =
-    x ! petalLength < 2 and x ! petalWidth < 0.5
+    x ! petalLength <= 2 and x ! petalWidth <= 0.5
 
 @property
 property5 : Bool
 property5 = forall x . validInput x and smallPetal x =>
-    isSetosa x
+    isMax setosa x
 
 --------------------------------------------------------------------------------
 -- Property 6
@@ -157,11 +171,11 @@ property5 = forall x . validInput x and smallPetal x =>
 
 bigPetal : Input -> Bool
 bigPetal x =
-    x ! petalLength > 6 and x ! petalWidth > 2
+    x ! petalLength >= 6 and x ! petalWidth >= 2
 
 @property
 property6 : Bool
 property6 = forall x . validInput x and bigPetal x =>
-    isVirginica x
+    isMax virginica x
 
 --------------------------------------------------------------------------------
