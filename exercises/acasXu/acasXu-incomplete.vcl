@@ -238,8 +238,8 @@ near x =
 intruderApproachingFromLeft : UnnormalisedInput -> Bool
 intruderApproachingFromLeft x =
   0.2 <= x ! angleToIntruder <= 0.4 and
-  -3.141592 <= x ! intruderHeading <= (−3.141592 + 0.005) and
-  100 <= x ! speed >= 400 and
+  -3.141592 <= x ! intruderHeading <= -3.141592 + 0.005 and
+  100 <= x ! speed <= 400 and
   0 <= x ! intruderSpeed  <= 400
 
 @property
@@ -262,10 +262,10 @@ property5 = forall x .
 
 far : UnnormalisedInput -> Bool
 far x = 
-  12000 <= x ! distanceToIntruder <= 62000 
-  (0.7 <= x ! angleToIntruder <= 3.141592 or −3.141592 <= x ! angleToIntruder <= −0.7 ) and
-  -3.141592 <= x ! intruderHeading <= (−3.141592 + 0.005) and
-  100 <= x ! speed >= 12000 and
+  12000 <= x ! distanceToIntruder <= 62000 and
+  (0.7 <= x ! angleToIntruder <= 3.141592 or -3.141592 <= x ! angleToIntruder <= -0.7 ) and
+  -3.141592 <= x ! intruderHeading <= (-3.141592 + 0.005) and
+  100 <= x ! speed <= 12000 and
   0 <= x ! intruderSpeed  <= 1200
 
 
@@ -290,10 +290,10 @@ property6 = forall x .
 
 verticalSeparationLarge : UnnormalisedInput -> Bool
 verticalSeparationLarge x = 
-  0 <= x ! distanceToIntruder <= 60760
-  (−3.141592 <= x ! angleToIntruder <= 3.141592) and
-  −3.141592 <= x ! intruderHeading <= (3.141592) and
-  100 <= x ! speed >= 12000 and
+  0 <= x ! distanceToIntruder <= 60760 and
+  (-3.141592 <= x ! angleToIntruder <= 3.141592) and
+  -3.141592 <= x ! intruderHeading <= (3.141592) and
+  100 <= x ! speed <= 12000 and
   0 <= x ! intruderSpeed  <= 1200
 
 @property
@@ -321,10 +321,10 @@ property7 = forall x .
 
 largeVerticalSeparation : UnnormalisedInput -> Bool
 largeVerticalSeparation x =
-  0 <= x ! distanceToIntruder <= 60760
-  (−3.141592 <= x ! angleToIntruder <= -0.75) and
-  −0.1 <= x ! intruderHeading <= (-0.1) and
-  600 <= x ! speed >= 1200 and
+  0 <= x ! distanceToIntruder <= 60760 and
+  (-3.141592 <= x ! angleToIntruder <= -0.75) and
+  -0.1 <= x ! intruderHeading <= (-0.1) and
+  600 <= x ! speed <= 1200 and
   0 <= x ! intruderSpeed  <= 1200
 
   -- the testing for only when previous advice was "weak left" comes from indexing of neural net files
@@ -351,10 +351,10 @@ property8 = forall x .
 
 nearbyIntruder : UnnormalisedInput -> Bool
 nearbyIntruder x =
-  2000 <= x ! distanceToIntruder <= 7000
+  2000 <= x ! distanceToIntruder <= 7000 and
   (-0.4 <= x ! angleToIntruder <= -0.14) and
-  −3.141592 <= x ! intruderHeading <= (−3.141592 + 0.01) and
-  100 <= x ! speed >= 150 and
+  -3.141592 <= x ! intruderHeading <= (-3.141592 + 0.01) and
+  100 <= x ! speed <= 150 and
   0 <= x ! intruderSpeed  <= 150
 
 @property
@@ -375,17 +375,17 @@ property9 = forall x .
 -- – Desired output property: the score for COC is minimal.
 
 farAwayIntruder : UnnormalisedInput -> Bool
-far x = 
-  36000 <= x ! distanceToIntruder <= 60760
+farAwayIntruder x = 
+  36000 <= x ! distanceToIntruder <= 60760 and
   (0.7 <= x ! angleToIntruder <= 3.141592) and
-  -3.141592 <= x ! intruderHeading <= (−3.141592 + 0.01) and
-  900 <= x ! speed >= 12000 and
+  -3.141592 <= x ! intruderHeading <= (-3.141592 + 0.01) and
+  900 <= x ! speed <= 1200 and
   600 <= x ! intruderSpeed  <= 1200
 
 
 @property
-property6 : Bool
-property6 = forall x .
-  validInput x and far x =>
+property10 : Bool
+property10 = forall x .
+  validInput x and farAwayIntruder x =>
   minimalScore clearOfConflict x
 
