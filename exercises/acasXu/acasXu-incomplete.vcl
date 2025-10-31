@@ -297,10 +297,10 @@ property7 = forall x .
 
 largeVerticalSeperation : UnnormalisedInput -> Bool
 largeVerticalSeperation x = 
-  0    <= x ! distanceToIntruder  <= 60760 and 
-  -pi  <= x ! angleToIntruder     <= -0.75 and
-  -0.1 <= x ! intruderHeading     <= 0.1   and
-  600  <= x ! speed               <= 1200  and
+  0    <= x ! distanceToIntruder  <= 60760      and 
+  -pi  <= x ! angleToIntruder     <= -0.75 * pi and
+  -0.1 <= x ! intruderHeading     <= 0.1        and
+  600  <= x ! speed               <= 1200       and
   600  <= x ! intruderSpeed       <= 1200 
 
 --------------------------------- TODO ---------------------------------
