@@ -137,8 +137,8 @@ intruderIsDistance disThresh_ x =
 
 intruderIsSlow : Real -> Real -> UnnormalisedInput -> Bool
 intruderIsSlow ownerVmin_ intruderVmax_ x = 
-  x ! intruderSpeed <= ownerVmin_ and 
-  x ! speed >= intruderVmax_
+  x ! intruderSpeed <= intruderVmax_ and 
+  x ! speed >= ownerVmin_
 
 advisesThreshold : Index 5 -> Real -> UnnormalisedInput -> Bool
 advisesThreshold i cocScoreThresh_ x =
@@ -151,7 +151,6 @@ property1 = forall x .
   intruderIsDistance disThresh x and
   intruderIsSlow ownerVmin intruderVmax x  
   => (advisesThreshold clearOfConflict cocScoreThresh x)
-
 
 --------------------------------------------------------------------------------
 -- Property 2
@@ -200,7 +199,7 @@ property3 = forall x .
   movingTowards x 
   => not(advises clearOfConflict x)
 
---------------------------------------------------------------------------------
+--------------------------------------------------------------------------------     
 -- Property 4
 
 -- If the intruder is directly ahead
