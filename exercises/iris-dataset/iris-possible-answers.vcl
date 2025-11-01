@@ -179,3 +179,44 @@ property6 = forall x . validInput x and bigPetal x =>
     isMax virginica x
 
 --------------------------------------------------------------------------------
+-- ************************************************************************** --
+-- ************************************************************************** --
+-- ************************************************************************** --
+-- property 7
+
+-- if 1.0 <= petalWidth <= 1.8  and  3.5 <= petalLength <= 4.5 
+-- the versicolor score is maximal
+
+middlePWandPL : Input -> Bool
+middlePWandPL x =
+    1.0 <= x ! petalWidth <= 1.8 and 
+    3.5 <= x ! petalLength <= 4.5 
+
+@property
+property7 : Bool
+property7 = forall x .
+    validInput x and
+    middlePWandPL x 
+    => isMax versicolor x
+
+--------------------------------------------------------------------------------
+-- property 8
+
+-- if petalWidth >= 2.0  or  petalLength >= 5.0 
+-- the versicolor score is not maximal
+
+versicolorOutRange : Input -> Bool
+versicolorOutRange x = 
+    2.0 <= x ! petalWidth or 
+    5.0 <= x ! petalLength 
+
+@property
+property8 : Bool
+property8 = forall x . 
+    validInput x and 
+    versicolorOutRange x
+    => not(isMax versicolor x)
+
+--------------------------------------------------------------------------------
+-- property 9
+
