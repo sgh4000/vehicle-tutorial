@@ -175,5 +175,44 @@ property4_margin = forall x .
   validInput x and farNarrow x =>
   advisesWithMargin clearOfConflict x
 
+--------------------------------------------------------------------------------
+-- Property 1 (handles embedding gap: problem-space inputs, scaled outputs)
+
+-- If the intruder is distant and significantly slower than ownship,
+-- then the Clear-of-Conflict (COC) score must be ≤ fixed threshold.
+-- Inputs (problem space):
+--   distanceToIntruder  ρ ≥ 55947.691 (m)
+--   speed (ownship)     v_own ≥ 1145 (m/s)
+--   intruderSpeed       v_int ≤ 60   (m/s)
+-- Output threshold given in problem space: 1500
+-- But the network outputs are scaled:
+--   scaled = (x - 7.518884) / 373.94992
+-- So we must compare to the scaled threshold:
+--   thresholdCOC_scaled = (1500 - 7.518884) / 373.94992
+
+outputOffset : Real
+outputOffset = 7.518884
+
+outputScale : Real
+outputScale = 373.94992
+
+thresholdCOC_scaled : Real
+thresholdCOC_scaled = (1500.0 - outputOffset) / outputScale
+
+-- Distant & slower secification in problem space
+distantAndSlower : UnnormalisedInput -> Bool
+distantAndSlower x =
+  x ! distanceToIntruder >= 55947.691 and
+  x ! speed              >= 1145.0     and
+  x ! intruderSpeed      <= 60.0
+
+@property
+property1 : Bool
+property1 = forall x .
+  validInput x and distantAndSlower x =>
+  -- Compare the network's scaled COC output to the scaled COC threshold.
+  normAcasXu x ! clearOfConflict <= thresholdCOC_scaled
+
+
 
 
