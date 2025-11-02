@@ -58,3 +58,23 @@ vehicle verify \
   --property property4_margin \
   --parameter eps:0.01
 '''
+
+## To run Property 1
+
+Property 1 (Embedding-gap): If the intruder is distant and is significantly slower than the ownship, the score of a COC advisory will always be below a certain fixed threshold.
+Means: when the intruder is far (ρ ≥ 55947.691 m) and much slower (v_own ≥ 1145 m/s, v_int ≤ 60 m/s), the COC score is ≤ 1500.
+Because ACAS Xu outputs are scaled as (x − 7.518884)/373.94992, we compare COC against the scaled threshold (1500 − 7.518884)/373.94992.
+
+The following command verifies `property1` for the network `acasXu_1_7.onnx`:
+
+```bash
+vehicle check --specification acasXu_prop4.vcl
+
+vehicle verify \
+  --specification acasXu_prop4.vcl \
+  --verifier Marabou \
+  --network acasXu:acasXu_1_7.onnx \
+  --property property1
+'''
+result: 🗸 - Marabou proved no counterexample exists.
+
