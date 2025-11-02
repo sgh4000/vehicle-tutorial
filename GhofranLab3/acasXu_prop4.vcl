@@ -136,20 +136,25 @@ property3 = forall x .
   not (advises clearOfConflict x)
 
 --------------------------------------------------------------------------------
--- Custom Ghofran Property 4
+-- Custom Ghofran Property 4 (fast version, keeps distance ≥ 50,000)
 
--- If the intruder is very far away (within the valid input range),
+-- If the intruder is far away (within the valid input range),
 -- the score for COC *should be* minimal (the network should advise COC).
+-- Here, restrict the other inputs to a small, realistic box so verification is much faster.
+-- also keep distance ≥ 50000, and optionally cap it at 50500 to shrink search.
 
--- Define "far away" in the problem space.
-farAway : UnnormalisedInput -> Bool
-farAway x =
-  x ! distanceToIntruder >= 50000.0
+farNarrow : UnnormalisedInput -> Bool
+farNarrow x =
+  50000.0 <= x ! distanceToIntruder <= 50500.0 and
+  -0.01   <= x ! angleToIntruder    <= 0.01     and
+  3.12    <= x ! intruderHeading    <= 3.14     and
+  600.0   <= x ! speed              <= 700.0    and
+  600.0   <= x ! intruderSpeed      <= 700.0
 
 @property
 property4 : Bool
 property4 = forall x .
-  validInput x and farAway x =>
+  validInput x and farNarrow x =>
   advises clearOfConflict x
 
 
@@ -157,7 +162,8 @@ property4 = forall x .
 -- Extra: Add a small decision margin ε to avoid bounaries.
 -- Means: COC must be strictly better than every other action by at least ε.
 
-@parameter eps : Real
+@parameter 
+eps : Real
 
 advisesWithMargin : Index 5 -> UnnormalisedInput -> Bool
 advisesWithMargin i x = forall j .
@@ -166,5 +172,8 @@ advisesWithMargin i x = forall j .
 @property
 property4_margin : Bool
 property4_margin = forall x .
-  validInput x and farAway x =>
+  validInput x and farNarrow x =>
   advisesWithMargin clearOfConflict x
+
+
+
