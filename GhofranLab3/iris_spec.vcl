@@ -157,5 +157,19 @@ property8 = forall x .
   withinDatasetRange x and tinyPetal x =>
   advises setosa x
 
+--------------------------------------------------------------------------------
+-- Margin versions for properties 7 & 8
+-- require the chosen class to beat others by at least ε
 
+@property
+property7_margin : Bool
+property7_margin = forall x .
+  withinDatasetRange x and versicolorMid x =>
+  advisesWithMargin versicolor x
+
+@property
+property8_margin : Bool
+property8_margin = forall x .
+  withinDatasetRange x and tinyPetal x =>
+  advisesWithMargin setosa x
 
