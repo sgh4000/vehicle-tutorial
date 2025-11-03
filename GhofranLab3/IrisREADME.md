@@ -17,11 +17,16 @@ vehicle check --specification iris_spec.vcl
 vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_setosa_box
 vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_virginica_box
 vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_versicolor_box
+vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property7
+vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property8
 
 # Margin versions with ε = 0.01
 vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_setosa_box_margin --parameter eps:0.01
 vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_virginica_box_margin --parameter eps:0.01
 vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_versicolor_box_margin --parameter eps:0.01
+vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property7_margin --parameter eps:0.01
+vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property8_margin --parameter eps:0.01
+
 ```
 
 ## Results and inteprtations:

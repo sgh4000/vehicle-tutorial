@@ -113,16 +113,6 @@ property_versicolor_box_margin = forall x .
   advisesWithMargin versicolor x
 
 --------------------------------------------------------------------------------
--- Note: "isVersicolor" (same pattern as isSetosa / isVirginica)
--- Meaning: the score for Versicolor is strictly greater than every other class,
--- This follows the same pattern as how Setosa and Virginica are defined
--- in the original iris exercise.
-
-isVersicolor : Input -> Bool
-isVersicolor x =
-    let scores = iris x in
-    forall i . i != versicolor => scores ! versicolor > scores ! i
---------------------------------------------------------------------------------
 
 -- Property 7
 
@@ -135,16 +125,16 @@ isVersicolor x =
 
 versicolorMid : Input -> Bool
 versicolorMid x =
-    4.0 <= x ! petalLength <= 5.0 and
-    1.2 <= x ! petalWidth  <= 1.8 and
-    5.0 <= x ! sepalLength <= 7.0 and
-    2.2 <= x ! sepalWidth  <= 3.4
+  4.35 <= x ! petalLength <= 4.65 and
+  1.35 <= x ! petalWidth  <= 1.55 and
+  5.8  <= x ! sepalLength <= 6.4  and
+  2.8  <= x ! sepalWidth  <= 3.1
 
 @property
 property7 : Bool
 property7 = forall x .
   withinDatasetRange x and versicolorMid x =>
-  isVersicolor x
+  advises versicolor x
 
 --------------------------------------------------------------------------------
 -- Property 8
@@ -156,8 +146,10 @@ property7 = forall x .
 
 tinyPetal : Input -> Bool
 tinyPetal x =
-    x ! petalLength <= 1.5 and
-    x ! petalWidth  <= 0.3
+  x ! petalLength <= 1.25 and
+  x ! petalWidth  <= 0.20 and
+  5.2 <= x ! sepalLength <= 5.8 and
+  2.7 <= x ! sepalWidth  <= 3.1
 
 @property
 property8 : Bool
