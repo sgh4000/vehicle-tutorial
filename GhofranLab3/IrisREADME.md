@@ -9,7 +9,7 @@ the [Iris Data set](<https://en.wikipedia.org/wiki/Iris_flower_data_set>)
 
 # To run Ghofran iris verfication
 
-'''bash
+```bash
 # Type-check
 vehicle check --specification iris_spec.vcl
 
@@ -22,5 +22,5 @@ vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:i
 vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_setosa_box_margin --parameter eps:0.01
 vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_virginica_box_margin --parameter eps:0.01
 vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_versicolor_box_margin --parameter eps:0.01
-'''
+```
 
