@@ -53,8 +53,8 @@ advises i x = forall j . i != j => iris x ! i < iris x ! j
 -- Setosa: very short & narrow petals
 setosaBox : Input -> Bool
 setosaBox x =
-  x ! petalLength <= 1.8 and
-  x ! petalWidth  <= 0.4
+  x ! petalLength <= 1.5 and
+  x ! petalWidth  <= 0.3
 
 @property
 property_setosa_box : Bool
