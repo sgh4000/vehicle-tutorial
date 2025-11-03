@@ -77,8 +77,8 @@ property_virginica_box = forall x .
 -- Versicolor: mid-range petals
 versicolorBox : Input -> Bool
 versicolorBox x =
-  3.5 <= x ! petalLength <= 5.0 and
-  1.0 <= x ! petalWidth  <= 1.7
+  4.0 <= x ! petalLength <= 4.8 and
+  1.3 <= x ! petalWidth  <= 1.6
 
 @property
 property_versicolor_box : Bool
@@ -112,7 +112,58 @@ property_versicolor_box_margin = forall x .
   withinDatasetRange x and versicolorBox x =>
   advisesWithMargin versicolor x
 
+--------------------------------------------------------------------------------
+-- Note: "isVersicolor" (same pattern as isSetosa / isVirginica)
+-- Meaning: the score for Versicolor is strictly greater than every other class,
+-- This follows the same pattern as how Setosa and Virginica are defined
+-- in the original iris exercise.
 
+isVersicolor : Input -> Bool
+isVersicolor x =
+    let scores = iris x in
+    forall i . i != versicolor => scores ! versicolor > scores ! i
+--------------------------------------------------------------------------------
+
+-- Property 7
+
+-- If petals are in a clear middle range (typical for Versicolor),
+-- and sepals are in a normal range, then the network should classify
+-- the input as Versicolor.
+-- These limits describe the common Versicolor region in the dataset.
+-- and are tighter (centered) to reduce counterexamples
+-- and speed up verification.
+
+versicolorMid : Input -> Bool
+versicolorMid x =
+    4.0 <= x ! petalLength <= 5.0 and
+    1.2 <= x ! petalWidth  <= 1.8 and
+    5.0 <= x ! sepalLength <= 7.0 and
+    2.2 <= x ! sepalWidth  <= 3.4
+
+@property
+property7 : Bool
+property7 = forall x .
+  withinDatasetRange x and versicolorMid x =>
+  isVersicolor x
+
+--------------------------------------------------------------------------------
+-- Property 8
+
+-- If petals are very small (clearly in the Setosa region),
+-- then the network should classify the input as Setosa.
+-- This is a stricter version of the Setosa rule from the excercise.
+
+
+tinyPetal : Input -> Bool
+tinyPetal x =
+    x ! petalLength <= 1.5 and
+    x ! petalWidth  <= 0.3
+
+@property
+property8 : Bool
+property8 = forall x .
+  withinDatasetRange x and tinyPetal x =>
+  advises setosa x
 
 
 
