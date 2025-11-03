@@ -26,6 +26,19 @@ virginica  = 2
 -- The model under verification
 @network
 iris : Input -> Output
+
+--------------------------------------------------------------------------------
+-- Check input data validity
+-- Dataset bounds (Iris ranges; give both lower & upper bounds)
+
+withinDatasetRange : Input -> Bool
+withinDatasetRange x =
+  4.3 <= x ! sepalLength <= 7.9 and
+  2.0 <= x ! sepalWidth  <= 4.4 and
+  1.0 <= x ! petalLength <= 6.9 and
+  0.1 <= x ! petalWidth  <= 2.5
+
+
 --------------------------------------------------------------------------------
 -- Selection specification: class i is chosen (score at i strictly smallest)
 advises : Index 3 -> Input -> Bool
@@ -34,7 +47,8 @@ advises i x = forall j . i != j => iris x ! i < iris x ! j
 --------------------------------------------------------------------------------
 -- Simple, well-known rules for the Iris flowers.
 -- These small value ranges (boxes) make the verification run faster.
--- The boxes are based on how petal size separates the three flower types.
+-- The boxes are based on how petal size separates the three flower types,
+-- as petal sizes distinguish classes well.
 
 -- Setosa: very short & narrow petals
 setosaBox : Input -> Bool
@@ -45,7 +59,8 @@ setosaBox x =
 @property
 property_setosa_box : Bool
 property_setosa_box = forall x .
-  setosaBox x => advises setosa x
+  withinDatasetRange x and setosaBox x =>
+  advises setosa x
 
 -- Virginica: long & wide petals
 virginicaBox : Input -> Bool
@@ -56,7 +71,8 @@ virginicaBox x =
 @property
 property_virginica_box : Bool
 property_virginica_box = forall x .
-  virginicaBox x => advises virginica x
+  withinDatasetRange x and virginicaBox x =>
+  advises virginica x
 
 -- Versicolor: mid-range petals
 versicolorBox : Input -> Bool
@@ -67,7 +83,8 @@ versicolorBox x =
 @property
 property_versicolor_box : Bool
 property_versicolor_box = forall x .
-  versicolorBox x => advises versicolor x
+  withinDatasetRange x and versicolorBox x =>
+  advises versicolor x
 
 --------------------------------------------------------------------------------
 -- Extra: margin (ε) to avoid cases where two classes have the same score.
@@ -80,16 +97,22 @@ advisesWithMargin i x = forall j . i != j => iris x ! i + eps < iris x ! j
 @property
 property_setosa_box_margin : Bool
 property_setosa_box_margin = forall x .
-  setosaBox x => advisesWithMargin setosa x
+  withinDatasetRange x and setosaBox x =>
+  advisesWithMargin setosa x
 
 @property
 property_virginica_box_margin : Bool
 property_virginica_box_margin = forall x .
-  virginicaBox x => advisesWithMargin virginica x
+  withinDatasetRange x and virginicaBox x =>
+  advisesWithMargin virginica x
 
 @property
 property_versicolor_box_margin : Bool
 property_versicolor_box_margin = forall x .
-  versicolorBox x => advisesWithMargin versicolor x
+  withinDatasetRange x and versicolorBox x =>
+  advisesWithMargin versicolor x
+
+
+
 
 
