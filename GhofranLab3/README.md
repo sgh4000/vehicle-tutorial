@@ -57,7 +57,8 @@ vehicle verify \
   --network acasXu:acasXu_1_7.onnx \
   --property property4_margin \
   --parameter eps:0.01
-'''
+```
+
 
 ## To run Property 1
 
@@ -75,6 +76,7 @@ vehicle verify \
   --verifier Marabou \
   --network acasXu:acasXu_1_7.onnx \
   --property property1
-'''
+```
+
 result: 🗸 - Marabou proved no counterexample exists.
 
