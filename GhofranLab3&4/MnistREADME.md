@@ -46,7 +46,9 @@ vehicle verify \
 Note that the epsilon value can be changed, but the memory requirements of Marabou may increase drastically as epsilon increases.
 
 
-## Results and inteprtations:
+# Results and inteprtations:
+
+## Standard Robustness:
 
 The property we are checking:
 “If we make tiny changes (no bigger than epsilon) to each image, the network should still predict the same digit.”
@@ -127,3 +129,13 @@ robust:
 - Image 1: Error, Marabou stopped unexpectedly because it ran out of memory or hit a resource limit, not that the property failed.
 2. For ε = 0.05, 0.1, and 0.5: both images failed to complete, Marabou ran out of memory again for all queries.
 3. Conclusion: the network is robust for very small ε, but as ε grows, it becomes too complex for the solver because the model likely changes predictions more and the verification itself becomes computationally expensive.
+
+
+## Strong Robustness:
+Strong Classification Robustness is similar to the normal robustness but here, we add an extra limit on the output score (the model’s confidence).
+
+- **In normal robustness:** if we change the input image a little (within epsilon), the class label shouldn’t change.
+- **In strong robustness:** if we change the input image a little (within epsilon), the class label shouldn’t change and the output score (the confidence) for that class should stay above a small threshold η.
+- **ε** = how much we can change the image (the noise size).
+- **η** = how much the output (confidence score) is allowed to change.
+
