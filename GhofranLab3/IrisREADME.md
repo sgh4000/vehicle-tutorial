@@ -70,6 +70,6 @@ This shows that the NN is not perfectly consistent with the ideal class boundari
 In particular, even points that look typical for one flower type may be misclassified when other features (like sepal size) take extreme values.
 When Marabou finds a counterexample, it means the network made at least one prediction that goes against our rule.
 This happens because:
-	1.The model isn’t perfect: it was trained on examples, not exact math rules, so mistakes or overlaps between classes are normal.
-	1. Our ranges include border areas: near the edges, classes mix, and the network can easily switch predictions.
-	1. Verification is very strict: Marabou checks every possible input in the range, so even one mismatch makes the property fail. It doesn’t mean the model is 		completely wrong, it’s just not always right for every value in that range.
+1. The model isn’t perfect: it was trained on examples, not exact math rules, so mistakes or overlaps between classes are normal.
+2. Our ranges include border areas: near the edges, classes mix, and the network can easily switch predictions.
+3. Verification is very strict: Marabou checks every possible input in the range, so even one mismatch makes the property fail. It doesn’t mean the model is 		completely wrong, it’s just not always right for every value in that range.
