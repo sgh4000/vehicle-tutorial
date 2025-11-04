@@ -30,7 +30,7 @@ vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:i
 ## Results and inteprtations:
 
 Each property says:
-“If the input features are in this typical range (the ‘box’), the network should predict this specific flower class.”
+“If the input features are in this typical range (box), the network should predict this specific flower class.”
 
 Marabou will try all possible inputs within that range to see if there’s any counterexample where the network chooses a different class.
 
@@ -71,5 +71,5 @@ In particular, even points that look typical for one flower type may be misclass
 When Marabou finds a counterexample, it means the network made at least one prediction that goes against our rule.
 This happens because:
 	1.The model isn’t perfect: it was trained on examples, not exact math rules, so mistakes or overlaps between classes are normal.
-	2. Our ranges include border areas: near the edges, classes mix, and the network can easily switch predictions.
-	3. Verification is very strict: Marabou checks every possible input in the range, so even one mismatch makes the property fail. It doesn’t mean the model is 		completely wrong, it’s just not always right for every value in that range.
+	1. Our ranges include border areas: near the edges, classes mix, and the network can easily switch predictions.
+	1. Verification is very strict: Marabou checks every possible input in the range, so even one mismatch makes the property fail. It doesn’t mean the model is 		completely wrong, it’s just not always right for every value in that range.
