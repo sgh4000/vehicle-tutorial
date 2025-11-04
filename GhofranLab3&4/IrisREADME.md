@@ -36,7 +36,7 @@ vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:i
 Marabou will try all possible inputs within that range to see if there’s any counterexample where the network chooses a different class.
 When result: ✗ - Marabou found a counterexample, means there exists at least one input that breaks the rule.
 
-```
+```bash
 (venv_vehicle) (base) ghofran@user:~/venv_vehicle/projects/vehicle-tutorial/GhofranLab3$ vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_setosa_box
 Verifying properties:
   property_setosa_box [............................................] 0/2 queries
@@ -45,7 +45,7 @@ Verifying properties:
 ```
 **Meaning:** The model did not classify this smallest flower as Setosa (could be predicted Versicolor or Virginica).
 
-```
+```bash
 (venv_vehicle) (base) ghofran@user:~/venv_vehicle/projects/vehicle-tutorial/GhofranLab3$ vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_virginica_box
 Verifying properties:
   property_virginica_box [.........................................] 0/2 queries
@@ -54,7 +54,7 @@ Verifying properties:
 ```
 **Meaning:** Even though the petals are long/wide, the model misclassified this case (maybe because sepal features are small).
 
-```
+```bash
 (venv_vehicle) (base) ghofran@user:~/venv_vehicle/projects/vehicle-tutorial/GhofranLab3$ vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property_versicolor_box
 Verifying properties:
   property_versicolor_box [........................................] 0/2 queries
@@ -63,7 +63,7 @@ Verifying properties:
 ```
 **Meaning:** The model gave another class (Setosa) for this case.
 
-```
+```bash
 (venv_vehicle) (base) ghofran@user:~/venv_vehicle/projects/vehicle-tutorial/GhofranLab3$ vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:iris_model.onnx --property property7
 Verifying properties:
   property7 [......................................................] 0/2 queries
