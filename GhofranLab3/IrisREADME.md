@@ -1,7 +1,5 @@
 # Iris Dataset Classifier Exercise
 
-In order to run the code for the ACAS Xu challenge, please obtain the model and specification from Vehicle main page ([examples section](<https://github.com/vehicle-lang/vehicle/tree/dev/examples/acasXu>)).
-
 The files you find here are for Exercise 1 in Chapter 1:  Your first Vehicle specification.
 You are asked to examine a data set and a model, write and verify your own soecification for it.
 For this purpose, we propose to take the "Hello World" of machine learning --
@@ -65,7 +63,7 @@ Verifying properties:
 ```
 Meaning: The model gave another class (Setosa) for this case.
 
-# Conclusion:
+## Conclusion:
 All three properties were falsified as Marabou found counterexamples inside each range.
 This shows that the NN is not perfectly consistent with the ideal class boundaries in the Iris dataset.
 
