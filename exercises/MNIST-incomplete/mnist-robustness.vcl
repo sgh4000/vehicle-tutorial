@@ -80,6 +80,9 @@ trainingImages : Vector Image n
 @dataset
 trainingLabels : Vector Label n
 
+----------------------------------------------------------------------------------
+-- property 1
+
 -- We then say that the network is robust if it is robust around every pair
 -- of input images and output labels. Note the use of the `foreach`
 -- keyword when quantifying over the index `i` in the dataset. Whereas `forall`
@@ -90,5 +93,28 @@ trainingLabels : Vector Label n
 -- state of affairs which is unlikely to be true.
 
 @property
-robust : Vector Bool n
-robust = foreach i . robustAround (trainingImages ! i) (trainingLabels ! i) -- [your answer here]
+property1 : Vector Bool n
+property1 = foreach i . robustAround (trainingImages ! i) (trainingLabels ! i) -- [your answer here]
+
+
+----------------------------------------------------------------------------------
+-- property 2
+
+-- Strong Classification Robustness in Vehicle
+-- |x_hat - x| <= epsilon ------> f(x) <= etha
+
+etha = 0.0001
+
+xHatMinusXLessThanEpsilon : Image -> Label -> Bool
+xHatMinusXLessThanEpsilon image label = forall perturbation . 
+  let perturbedImage = image - perturbation in
+  boundedByEpsilon perturbation and 
+  validImage perturbedImage
+  => classifier perturbedImage ! label <= etha
+
+
+@property
+property2 : Bool
+property2 = forall i . 
+  xHatMinusXLessThanEpsilon (trainingImages ! i) (trainingLabels ! i)
+
