@@ -56,8 +56,8 @@ robustAround image label = forall pertubation .
 
 -- We only really care about the network being robust on the set of images it
 -- will encounter. Indeed it is much more challenging to expect the network
--- to be robust around all possible images. After all most images will be just
--- be random noise.
+-- to be robust around all possible images. After all, most images will be just
+-- random noise.
 
 -- Unfortunately we can't characterise the set of "reasonable" input images.
 -- Instead we approximate it using the training dataset, and ask that the

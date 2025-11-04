@@ -65,7 +65,13 @@ Verifying properties:
 ```
 Meaning: The model gave another class (Setosa) for this case.
 
+# Conclusion:
 All three properties were falsified as Marabou found counterexamples inside each range.
 This shows that the NN is not perfectly consistent with the ideal class boundaries in the Iris dataset.
+
 In particular, even points that look typical for one flower type may be misclassified when other features (like sepal size) take extreme values.
-These counterexamples are useful for understanding where the model’s decision boundaries are weak or don’t match human intuition.
+When Marabou finds a counterexample, it means the network made at least one prediction that goes against our rule.
+This happens because:
+	1.The model isn’t perfect: it was trained on examples, not exact math rules, so mistakes or overlaps between classes are normal.
+	2. Our ranges include border areas: near the edges, classes mix, and the network can easily switch predictions.
+	3. Verification is very strict: Marabou checks every possible input in the range, so even one mismatch makes the property fail. It doesn’t mean the model is 		completely wrong, it’s just not always right for every value in that range.
