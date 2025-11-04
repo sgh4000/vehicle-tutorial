@@ -55,6 +55,7 @@ After running robustness verification for two MNIST images (the first two in the
 
 
 ```bash
+# eps = 0.005
 Verifying properties:
   robust!0 [=======================================================] 9/9 queries
     result: 🗸 - Marabou proved no counterexample exists
@@ -67,3 +68,68 @@ robust:
     errored:   0/2
 ```
 **Meaning:** Both of the tested images are robust, i.e. small pixel changes (within epsilon = 0.005) do not confuse the network. That means, the model’s predictions are stable and reliable against tiny noise or adversarial tweaks.
+
+```bash
+# eps = 0.01
+Verifying properties:
+  robust!0 [=======================================================] 9/9 queries
+    result: 🗸 - Marabou proved no counterexample exists
+  robust!1 [============>..........................................] 2/9 queries
+    result: ? - Marabou errored
+
+Error: Marabou was killed with the signal '9'. This is often (but not always) a result of the Marabou verifier running out of memory.
+A reproducer has been created at:
+
+  /home/ghofran/.vehicle/reproducers/3245576383020918781
+
+which can be run using:
+
+  /home/ghofran/venv_vehicle/bin/Marabou /home/ghofran/.vehicle/reproducers/3245576383020918781/mnist-classifier.onnx /home/ghofran/.vehicle/reproducers/3245576383020918781/robust!1-query2.txt
+robust:
+    verified:  1/2
+    falsified: 0/2
+    timed-out: 0/2
+    errored:   1/2
+
+# eps = 0.05 or 0.1 or 0.5
+Verifying properties:
+  robust!0 [======>................................................] 1/9 queries
+    result: ? - Marabou errored
+
+Error: Marabou was killed with the signal '9'. This is often (but not always) a result of the Marabou verifier running out of memory.
+A reproducer has been created at:
+
+  /home/ghofran/.vehicle/reproducers/3103867250748508961
+
+which can be run using:
+
+  /home/ghofran/venv_vehicle/bin/Marabou /home/ghofran/.vehicle/reproducers/3103867250748508961/mnist-classifier.onnx /home/ghofran/.vehicle/reproducers/3103867250748508961/robust!0-query1.txt
+  robust!1 [======>................................................] 1/9 queries
+    result: ? - Marabou errored
+
+Error: Marabou was killed with the signal '9'. This is often (but not always) a result of the Marabou verifier running out of memory.
+A reproducer has been created at:
+
+  /home/ghofran/.vehicle/reproducers/7225309814801678315
+
+which can be run using:
+
+  /home/ghofran/venv_vehicle/bin/Marabou /home/ghofran/.vehicle/reproducers/7225309814801678315/mnist-classifier.onnx /home/ghofran/.vehicle/reproducers/7225309814801678315/robust!1-query1.txt
+robust:
+    verified:  0/2
+    falsified: 0/2
+    timed-out: 0/2
+    errored:   2/2
+```
+**Meaning:** 
+1. For ε = 0.01:
+- Image 0: Verified, the model stayed stable even with small pixel changes.
+- Image 1: Error, Marabou stopped unexpectedly because it ran out of memory or hit a resource limit, not that the property failed.
+
+2. For ε = 0.05, 0.1, and 0.5:
+Both images failed to complete, Marabou ran out of memory again for all queries.
+
+3. Conclusion:
+As ε increases, verification becomes harder and slower, and the solver may not finish due to the huge number of possibilities.
+This doesn’t mean the model is non robust, it means Marabou couldn’t finish checking because of the computation limits.
+
