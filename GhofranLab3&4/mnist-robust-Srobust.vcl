@@ -21,26 +21,31 @@ validImage x = forall i j . 0 <= x ! i ! j <= 1
 @network
 classifier : Image -> Tensor Real [10]
 
+-- Standard advising: label i wins if its score is strictly greater
+-- than every other label's score.
 -- The classifier advises that input image `x` has label `i` if the score
 -- for label `i` is greater than the score of any other label `j`.
 advises : Image -> Label -> Bool
 advises x i = forall j . j != i => classifier x ! i > classifier x ! j
 
 --------------------------------------------------------------------------------
--- Definition of robustness around a point
+-- Robustness around a point (standard)
 
 -- First we define the parameter `epsilon` that will represent the radius of the
 -- ball that we want the network to be robust in. Note that we declare this as
 -- a parameter which allows the value of `epsilon` to be specified at compile
--- time rather than be fixed in the specification.
+-- time rather than be fixed in the specification.-- A perturbation (image-shaped) is bounded by epsilon in L-infinity sense
 @parameter
 epsilon : Real
 
 -- Next we define what it means for an image `x` to be in a ball of
 -- size epsilon around 0.
+-- A perturbation (image-shaped) is bounded by epsilon in L-infinity sense
 boundedByEpsilon : Image -> Bool
 boundedByEpsilon x = forall i j . -epsilon <= x ! i ! j <= epsilon
 
+-- Standard robustness: for any small perturbation, if the perturbed image is valid,
+-- the classifier's predicted label for the perturbed image remains the same.
 -- We now define what it means for the network to be robust around an image `x`
 -- that should be classified as `y`. Namely, that for any perturbation no greater
 -- than epsilon then if the perturbed image is still a valid image then the
@@ -50,6 +55,25 @@ robustAround image label = forall pertubation .
   let perturbedImage = image - pertubation in
   boundedByEpsilon pertubation and validImage perturbedImage =>
     advises perturbedImage label
+
+-------------------------------------------------------------------------------
+-- Strong classification robustness
+
+-- Extra parameter: eta is the minimum score the correct class must keep
+@parameter
+eta : Real
+
+-- Strong advising: the correct class keeps at least eta confidence on image x.
+aboveEta : Image -> Label -> Bool
+aboveEta x i = classifier x ! i > eta
+
+-- Strong robustness: within the epsilon-ball, the correct label's score
+-- stays above eta.
+robustAroundStrong : Image -> Label -> Bool
+robustAroundStrong image label = forall pertubation .
+  let perturbedImage = image - pertubation in
+  boundedByEpsilon pertubation and validImage perturbedImage =>
+    aboveEta perturbedImage label
 
 --------------------------------------------------------------------------------
 -- Robustness with respect to a dataset
@@ -80,6 +104,7 @@ trainingImages : Vector Image n
 @dataset
 trainingLabels : Vector Label n
 
+-- Vector of booleans: standard robustness result per image
 -- We then say that the network is robust if it is robust around every pair
 -- of input images and output labels. Note the use of the `foreach`
 -- keyword when quantifying over the index `i` in the dataset. Whereas `forall`
@@ -91,3 +116,8 @@ trainingLabels : Vector Label n
 @property
 robust : Vector Bool n
 robust = foreach i . robustAround (trainingImages ! i) (trainingLabels ! i)
+
+-- Vector of booleans: strong robustness result per image
+@property
+robustStrong : Vector Bool n
+robustStrong = foreach i . robustAroundStrong (trainingImages ! i) (trainingLabels ! i)
