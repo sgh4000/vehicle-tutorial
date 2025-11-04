@@ -164,4 +164,4 @@ robustStrong:
     timed-out: 0/2
     errored:   0/2
 ```
-**Meaning:* For both images, no possible small change (within ε = 0.005) could make the network’s confidence in the correct label drop below η = 0.1.
+**Meaning:** For both images, no possible small change (within ε = 0.005) could make the network’s confidence in the correct label drop below η = 0.1.
