@@ -1,5 +1,6 @@
 --------------------------------------------------------------------------------
 -- Inputs and outputs
+-- vehicle verify   --specification mnist-robustness.vcl   --network classifier:mnist-classifier.onnx   --parameter epsilon:0.005   --dataset trainingImages:500-images.idx   --dataset trainingLabels:500-labels.idx   --verifier Marabou --property property1
 
 -- Define the type for our input images. Note that the input is two-dimensional
 
@@ -96,7 +97,6 @@ trainingLabels : Vector Label n
 property1 : Vector Bool n
 property1 = foreach i . robustAround (trainingImages ! i) (trainingLabels ! i) -- [your answer here]
 
-
 ----------------------------------------------------------------------------------
 -- property 2
 
@@ -110,11 +110,16 @@ xHatMinusXLessThanEpsilon image label = forall perturbation .
   let perturbedImage = image - perturbation in
   boundedByEpsilon perturbation and 
   validImage perturbedImage
-  => classifier perturbedImage ! label <= etha
-
+  => classifier perturbedImage ! label >= etha
 
 @property
 property2 : Bool
 property2 = forall i . 
   xHatMinusXLessThanEpsilon (trainingImages ! i) (trainingLabels ! i)
+
+----------------------------------------------------------------------------------
+-- property 3
+
+-- Strong Classification Robustness in Vehicle
+-- |x_hat - x| <= epsilon ------> f(x) <= etha
 

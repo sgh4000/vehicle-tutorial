@@ -1,0 +1,40 @@
+For TWO images:
+
+  Epsilon: 0.005
+
+    (proj311) mohammad@mohammad:~/D2AIR/vehicle-tutorial/exercises/MNIST-incomplete$ vehicle verify   --specification mnist-robustness.vcl   --network classifier:mnist-classifier.onnx   --parameter epsilon:0.005   --dataset trainingImages:t2-images.idx   --dataset trainingLabels:t2-labels.idx   --verifier Marabou --property property1
+    Verifying properties:
+      property1!0 [====================================================] 9/9 queries
+        result: 🗸 - Marabou proved no counterexample exists
+      property1!1 [====================================================] 9/9 queries
+        result: 🗸 - Marabou proved no counterexample exists
+    property1:
+        verified:  2/2
+        falsified: 0/2
+        timed-out: 0/2
+        errored:   0/2
+
+  Epsilon: 0.01
+    Verifying properties:
+  property1!0 [====================================================] 9/9 queries
+    result: 🗸 - Marabou proved no counterexample exists
+  property1!1 [===========>........................................] 2/9 queries
+    result: ? - Marabou errored
+
+Error: Marabou was killed with the signal '9'. This is often (but not always) a result of the Marabou verifier running out of memory.
+A reproducer has been created at:
+
+  /home/mohammad/.vehicle/reproducers/1198375882024798624
+
+which can be run using:
+
+  /home/mohammad/anaconda3/envs/proj311/bin/Marabou /home/mohammad/.vehicle/reproducers/1198375882024798624/mnist-classifier.onnx /home/mohammad/.vehicle/reproducers/1198375882024798624/property1!1-query2.txt
+property1:
+    verified:  1/2
+    falsified: 0/2
+    timed-out: 0/2
+    errored:   1/2
+
+
+
+
