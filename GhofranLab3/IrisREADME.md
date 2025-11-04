@@ -29,9 +29,9 @@ vehicle verify --specification iris_spec.vcl --verifier Marabou --network iris:i
 
 ## Results and inteprtations:
 
-Each property says: “If the input features are in this typical range (box), the network should predict this specific flower class.”
-Property 7: checks that flowers with medium-sized petals and normal sepals are correctly classified as Versicolor.
-Property 8: checks that flowers with very small petals and small sepals are correctly classified as Setosa.
+- Each property says: “If the input features are in this typical range (box), the network should predict this specific flower class.”
+- Property 7: checks that flowers with medium-sized petals and normal sepals are correctly classified as Versicolor.
+- Property 8: checks that flowers with very small petals and small sepals are correctly classified as Setosa.
 
 Marabou will try all possible inputs within that range to see if there’s any counterexample where the network chooses a different class.
 When result: ✗ - Marabou found a counterexample, means there exists at least one input that breaks the rule.
