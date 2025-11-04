@@ -35,7 +35,7 @@ A network can be verified against the specification by running the following com
 
 ```bash
 vehicle verify \
-  --specification mnist-robustness.vcl \
+  --specification mnist-robust-Srobust.vcl \
   --network classifier:mnist-classifier.onnx \
   --parameter epsilon:0.005 \
   --dataset trainingImages:t2-images.idx \
@@ -139,3 +139,29 @@ Strong Classification Robustness is similar to the normal robustness but here, w
 - **ε** = how much we can change the image (the noise size).
 - **η** = how much the output (confidence score) is allowed to change.
 
+To run  the Strong Classification Robustness property:
+```bash
+vehicle verify \
+  --specification mnist-robust-Srobust.vcl \
+  --network classifier:mnist-classifier.onnx \
+  --dataset trainingImages:t2-images.idx \
+  --dataset trainingLabels:t2-labels.idx \
+  --parameter epsilon:0.005 \
+  --parameter eta:0.1 \
+  --property robustStrong \
+  --verifier Marabou
+```
+After running:
+```bash
+Verifying properties:
+  robustStrong!0 [=================================================] 1/1 queries
+    result: 🗸 - Marabou proved no counterexample exists
+  robustStrong!1 [=================================================] 1/1 queries
+    result: 🗸 - Marabou proved no counterexample exists
+robustStrong:
+    verified:  2/2
+    falsified: 0/2
+    timed-out: 0/2
+    errored:   0/2
+```
+**Meaning:* For both images, no possible small change (within ε = 0.005) could make the network’s confidence in the correct label drop below η = 0.1.
