@@ -1,13 +1,10 @@
 # MNIST robustness example
 
-This is an example of a specification for the widely studied adversarial
-robustness problem.
-At a high-level the specification states that any small small pertubation to the
-input, e.g. adjusting a few pixels, should not significantly change the output
+This is an example of a specification for the widely studied adversarial robustness problem.
+At a high-level the specification states that any small small pertubation to the input, e.g. adjusting a few pixels, should not significantly change the output
 of the network.
 
-Although this example is specialised to image classification, in particular
-to the MNIST dataset, it should be relatively easy to tweak to other domains.
+Although this example is specialised to image classification, in particular to the MNIST dataset, it should be relatively easy to tweak to other domains.
 
 This folder contains the following files:
 
@@ -46,5 +43,27 @@ vehicle verify \
   --verifier Marabou
 ```
 
-Note that the epsilon value can be changed, but the memory requirements of
-Marabou may increase drastically as epsilon increases.
+Note that the epsilon value can be changed, but the memory requirements of Marabou may increase drastically as epsilon increases.
+
+
+## Results and inteprtations:
+
+The property we are checking:
+“If we make tiny changes (no bigger than epsilon) to each image, the network should still predict the same digit.”
+
+After running robustness verification for two MNIST images (the first two in the dataset):
+
+
+```bash
+Verifying properties:
+  robust!0 [=======================================================] 9/9 queries
+    result: 🗸 - Marabou proved no counterexample exists
+  robust!1 [=======================================================] 9/9 queries
+    result: 🗸 - Marabou proved no counterexample exists
+robust:
+    verified:  2/2
+    falsified: 0/2
+    timed-out: 0/2
+    errored:   0/2
+```
+**Meaning:** Both of the tested images are robust, i.e. small pixel changes (within epsilon = 0.005) do not confuse the network. That means, the model’s predictions are stable and reliable against tiny noise or adversarial tweaks.
