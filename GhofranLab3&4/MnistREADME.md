@@ -125,11 +125,7 @@ robust:
 1. For ε = 0.01:
 - Image 0: Verified, the model stayed stable even with small pixel changes.
 - Image 1: Error, Marabou stopped unexpectedly because it ran out of memory or hit a resource limit, not that the property failed.
-
-2. For ε = 0.05, 0.1, and 0.5:
-Both images failed to complete, Marabou ran out of memory again for all queries.
-
-3. Conclusion:
-As ε increases, verification becomes harder and slower, and the solver may not finish due to the huge number of possibilities.
+2. For ε = 0.05, 0.1, and 0.5: both images failed to complete, Marabou ran out of memory again for all queries.
+3. Conclusion: as ε increases, verification becomes harder and slower, and the solver may not finish due to the huge number of possibilities.
 This doesn’t mean the model is non robust, it means Marabou couldn’t finish checking because of the computation limits.
 
