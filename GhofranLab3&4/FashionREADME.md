@@ -55,7 +55,8 @@ vehicle verify \
 
 ## Verification Results and Interpretation
 
-After running the code we got:
+
+After running the code we got for different definitions of robustness:
 
 | **Image** | **Property Tested** | **Type of Robustness** | **Result** | **Meaning of Result** |
 |:-----------|:-------------------:|:-----------------------:|:------------:|:----------------------|
@@ -67,17 +68,16 @@ After running the code we got:
 | Image3 | _same 3 properties_ | _(same as above)_ | ✅ Verified for all | Classifier remained robust and confident. |
 | Image4 | _same 3 properties_ | _(same as above)_ | ✅ Verified for all | Network proved stable and reliable for minor input changes. |
 
-Classification Robustness (L∞) for Image 0 across your four ε values.
+Classification Robustness (L∞) for Image0 across four ε values:
 
-
-| **ε (L∞)** | **Result** | **Meaning** | **Notes (from Marabou)** |
+| **ε** | **Result** | **Meaning** | **Notes (from Marabou)** |
 |:------:|:------:|:--------|:---------------------|
 | 0.01 | ✅ Verified | No counterexample within ε=0.01 — prediction is stable to very small pixel changes. | `robust!0` proved. |
 | 0.05 | ✗ Falsified | A counterexample exists within ε=0.05 — small changes can flip the label. | Marabou returned a specific perturbation (values around ±0.05). |
 | 0.10 | ✗ Falsified | A counterexample exists within ε=0.10 — larger allowed changes flip the label. | Marabou returned a concrete perturbation (values around ±0.1). |
 | 0.50 | ✗ Falsified | A counterexample exists within ε=0.50 — very large changes easily flip the label. | Marabou returned a concrete perturbation (values around ±0.5). |
 
-**Inrepetation** robustness holds for tiny noise (ε=0.01), but breaks once the  per-pixel change grows beyond ε≥0.05.
+**Interpretation:** robustness holds for tiny noise (ε=0.01), but breaks once the  per-pixel change grows beyond ε≥0.05. It's important to note that I've got the same results for the rest of images (1-4) when testing theie robustness across the same differnt values of ε used for Image0.
 
 
 
