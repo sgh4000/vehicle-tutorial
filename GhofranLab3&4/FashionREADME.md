@@ -88,10 +88,13 @@ Overall, these results suggest the Fashion-MNIST model is robust and confident a
 
 **Interpretation:** robustness holds for tiny noise (ε=0.01), but breaks once the  per-pixel change grows beyond ε≥0.05. It's important to note that I've got the same results for the rest of images (1-4) when testing the classification robustness across the same various values of ε used for Image0.
 
-
 **Overall Conclusion:** 
-=======================
 
+- The Fashion-MNIST model was tested for robustness using five images and three definitions of robustness (Classification L∞, Strong Classification L∞, and Classification L2). All five images showed similar stable results, proving the model is resistant to small pixel changes.
+
+- When testing Classification Robustness (L∞) across four epsilon values (0.01, 0.05, 0.1, 0.5), the behaviour was consistent:
+the model stayed robust for very small perturbations (ε = 0.01) but failed when the noise grew larger (ε ≥ 0.05).
+This suggests that the trained Fashion-MNIST network is locally robust to tiny image variations but loses stability as the disturbance increases.
 
 
 
