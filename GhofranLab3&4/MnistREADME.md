@@ -190,7 +190,6 @@ vehicle verify \
   --dataset trainingLabels:t2-labels.idx \
   --parameter epsilon2:0.1 \
   --property robustL2 \
-  --parameter eta:0.1 \
   --verifier Marabou
 ```
 
