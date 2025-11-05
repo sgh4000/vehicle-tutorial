@@ -37,7 +37,7 @@ The outputs of the above Vehicle commands can be found in the test suite:
 
 ## To run Ghofran Property 4
 
-This property checks that when the intruder aircraft is very far away—about 50 km or more—the ACAS Xu network advises the pilot that the situation is Clear of Conflict (COC).
+This property checks that when the intruder aircraft is very far away (about 50 km or more), the ACAS Xu network advises the pilot that the situation is Clear of Conflict (COC).
 To keep verification efficient (faster), all other input variables (angle, heading, and both aircraft speeds) are limited to a narrow, realistic range that represents a steady, straight-flight scenario.
 
 The following command verifies `property4` for the network `acasXu_1_7.onnx`:
