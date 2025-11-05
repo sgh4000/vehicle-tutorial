@@ -5,7 +5,7 @@
 type Image = Tensor Real [28, 28]
 
 -- The type of the output labels
--- i.e a number between 0 and 9, one for each digit
+-- i.e a number between 0 and 9, one for each fashion image
 type Label = Index 10
 
 -- A predicate that states that all the pixel values in a given image are
@@ -17,7 +17,7 @@ validImage x = forall i j . 0 <= x ! i ! j <= 1
 -- Network
 
 -- Declare the network used to classify images. The output of the network is a
--- score for each of the digits 0 to 9.
+-- score for each of the clothes 0 to 9.
 @network
 classifier : Image -> Tensor Real [10]
 
@@ -158,4 +158,6 @@ robustStrong = foreach i . robustAroundStrong (trainingImages ! i) (trainingLabe
 @property
 robustL2 : Vector Bool n
 robustL2 = foreach i . robustAround_L2 (trainingImages ! i) (trainingLabels ! i)
+
+
 
