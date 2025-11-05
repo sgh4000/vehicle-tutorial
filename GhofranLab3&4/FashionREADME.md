@@ -42,7 +42,7 @@ vehicle verify \
   --property robustStrong \
   --verifier Marabou
 
-# Classification Robustness (L2-style, conservative):
+# Classification Robustness (L2):
 vehicle verify \
   --specification fashionRobustness.vcl \
   --network classifier:fashion1l32n.onnx \
