@@ -76,7 +76,7 @@ robustAroundStrong image label = forall pertubation .
     aboveEta perturbedImage label
 
 --------------------------------------------------------------------------------
--- Alternative robustness using Euclidean distance (L2)
+-- Alternative robustness using Euclidean distance (L2 distance)
 
 -- The real L2 distance uses squares and square roots (non-linear), sum of squares <= epsilon2^2,
 -- but Marabou can only handle simple (linear) maths.

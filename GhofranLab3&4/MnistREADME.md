@@ -48,7 +48,7 @@ Note that the epsilon value can be changed, but the memory requirements of Marab
 
 # Results and inteprtations:
 
-## Standard Robustness:
+## Standard Robustness (L∞ distance):
 
 The property we are checking:
 “If we make tiny changes (no bigger than epsilon) to each image, the network should still predict the same digit.”
@@ -131,7 +131,7 @@ robust:
 3. Conclusion: the network is robust for very small ε, but as ε grows, it becomes too complex for the solver because the model likely changes predictions more and the verification itself becomes computationally expensive.
 
 
-## Strong Robustness:
+## Strong Robustness (L∞ distance):
 Strong Classification Robustness is similar to the normal robustness but here, we add an extra limit on the output score (the model’s confidence).
 
 - **In normal robustness:** if we change the input image a little (within epsilon), the class label shouldn’t change.
@@ -139,7 +139,7 @@ Strong Classification Robustness is similar to the normal robustness but here, w
 - **ε** = how much we can change the image (the noise size).
 - **η** = how much the output (confidence score) is allowed to change.
 
-To run  the Strong Classification Robustness property:
+To run the Strong Classification Robustness property:
 ```bash
 vehicle verify \
   --specification mnist-robust-Srobust.vcl \
@@ -165,3 +165,33 @@ robustStrong:
     errored:   0/2
 ```
 **Meaning:** For both images, no possible small change (within ε = 0.005) could make the network’s confidence in the correct label drop below η = 0.1.
+
+## Standard Robustness (L2 distance):
+We already defined robustness using the L∞ distance (each pixel can change at most ε up or down).
+Now we redefine robustness using the Euclidean L2 distance (overall change in the whole image is ≤ ε).
+- **L∞:** Each pixel can move up to ±ε.
+- **L2:** All pixels together move less than ε₂.
+
+True L2 uses squares and square-roots (non-linear), but Marabou only supports linear constraints. That's why we use a linear approximation of the L2 ball:
+
+If the image dimension is 28×28 = 784 pixels, then ensuring
+**|Δpixel| ≤ (ε₂ / √784) --> |Δpixel| ≤ (ε₂ / 28)** for every pixel guarantees that the L2 change ≤ ε₂.
+
+To on pick ε₂:
+
+- Start small: 0.05 or 0.1.
+- Remember that per-pixel bound becomes epsilon2 / 28, if ε₂=0.1 --> per-pixel limit ≈ 0.00357.
+
+To run the Standard Robustness (L2) property:
+```bash
+vehicle verify \
+  --specification mnist-robust-Srobust.vcl \
+  --network classifier:mnist-classifier.onnx \
+  --dataset trainingImages:t2-images.idx \
+  --dataset trainingLabels:t2-labels.idx \
+  --parameter epsilon2:0.1 \
+  --property robustL2 \
+  --parameter eta:0.1 \
+  --verifier Marabou
+
+
