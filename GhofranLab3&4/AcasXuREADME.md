@@ -35,7 +35,9 @@ The outputs of the above Vehicle commands can be found in the test suite:
 
 - [Automatically generated Marabou queries](https://github.com/vehicle-lang/vehicle/tree/dev/vehicle/tests/golden/compile/acasXu/acasXu.inputquery)
 
-## To run Ghofran Property 4
+# Ghofran's Code:
+
+## To run Property 4
 
 This property checks that when the intruder aircraft is very far away (about 50 km or more), the ACAS Xu network advises the pilot that the situation is Clear of Conflict (COC).
 To keep verification efficient (faster), all other input variables (angle, heading, and both aircraft speeds) are limited to a narrow, realistic range that represents a steady, straight-flight scenario.
@@ -43,22 +45,19 @@ To keep verification efficient (faster), all other input variables (angle, headi
 The following command verifies `property4` for the network `acasXu_1_7.onnx`:
 
 ```bash
-vehicle check --specification acasXu_prop4.vcl
-
 vehicle verify \
-  --specification acasXu_prop4.vcl \
+  --specification acasXu_prop4_1.vcl \
   --verifier Marabou \
   --network acasXu:acasXu_1_7.onnx \
   --property property4
 
-vehicle verify \
-  --specification acasXu_prop4.vcl \
-  --verifier Marabou \
-  --network acasXu:acasXu_1_7.onnx \
-  --property property4_margin \
-  --parameter eps:0.01
+# After running:
+Verifying properties:
+  property4 [=============>........................................] 1/4 queries
+    result: ✗ - Marabou found a counterexample
+      x: [ 50039.70256, -1.0002828928e-2, 3.120002979776, 697.1288, 668.7324 ]
 ```
-
+**Meaning:** there is at least one situation where, even though the intruder aircraft is far away (around 50 km), the network did not correctly advise COC. This shows the model may give a wrong advisory in some edge cases.
 
 ## To run Property 1
 
@@ -69,14 +68,16 @@ Because ACAS Xu outputs are scaled as (x − 7.518884)/373.94992, we compare COC
 The following command verifies `property1` for the network `acasXu_1_7.onnx`:
 
 ```bash
-vehicle check --specification acasXu_prop4.vcl
-
 vehicle verify \
-  --specification acasXu_prop4.vcl \
+  --specification acasXu_prop4_1.vcl \
   --verifier Marabou \
   --network acasXu:acasXu_1_7.onnx \
   --property property1
-```
 
-result: 🗸 - Marabou proved no counterexample exists.
+# After running:
+Verifying properties:
+  property1 [======================================================] 1/1 queries
+    result: 🗸 - Marabou proved no counterexample exists
+```
+**Meaning:** Marabou proved that for all valid input ranges, the network always keeps the COC score below the safety threshold. In simple words, the model behaves safely and as expected when the intruder is far and moving much slower.
 
