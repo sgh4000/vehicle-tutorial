@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 -- Full specification of the ACAS XU networks
 
+-- vehicle verify   --specification acasXu-incomplete.vcl   --network acasXu:ACASXU_experimental_v2a_3_9.onnx  --verifier Marabou  --property property3
+
 -- Taken from Appendix VI of "Reluplex: An Efficient SMT Solver for Verifying
 -- Deep Neural Networks" at https://arxiv.org/pdf/1702.01135.pdf
 

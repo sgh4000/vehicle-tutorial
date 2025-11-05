@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 -- Notes to be considered
 
+-- vehicle verify   --specification iris-possible-answers.vcl   --network iris:iris_model.onnx  --verifier Marabou  --property property8
+
 -- It's not working with this function. The only difference is the virginica score, which I gave it to the function
 -- isVirginica : Input -> Bool
 -- isVirginica x =
@@ -166,7 +168,7 @@ property5 = forall x . validInput x and smallPetal x =>
 --------------------------------------------------------------------------------
 -- Property 6
 
--- If the petal length (sl) is longer than 6 and the petal width is longer than 2,
+-- If the petal length (pl) is longer than 6 and the petal width is longer than 2,
 -- then it is virginica
 
 bigPetal : Input -> Bool

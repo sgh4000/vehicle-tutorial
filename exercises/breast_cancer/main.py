@@ -232,11 +232,88 @@ def main():
     plt.show()
 
 
-    # ---- ONE BIG FIGURE: P(class=1) vs each raw test feature (subplots)
+    # # ---- ONE BIG FIGURE: P(class=1) vs each raw test feature (subplots)
+    # feature_names = Xdf_test.columns.tolist()
+
+    # # ensure arrays are 1-D
+    # p_te_1d = np.asarray(p_te, dtype=np.float32).ravel()
+    # y_te_1d = np.asarray(y_te_1d, dtype=np.int64).ravel()
+
+    # n_feats = len(feature_names)
+    # if n_feats == 0:
+    #     print("No features to plot.")
+    # else:
+    #     # grid layout
+    #     n_cols = 4  # tweak if you want fewer/more columns
+    #     n_rows = int(np.ceil(n_feats / n_cols))
+
+    #     fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.5 * n_cols, 3.3 * n_rows), squeeze=False)
+    #     fig.suptitle("P(class=1) vs Raw Test Features", y=0.995, fontsize=14)
+
+    #     # shared settings
+    #     nbins = 20
+    #     y_min, y_max = -0.05, 1.05
+
+    #     # colors for labels (keep simple)
+    #     colors = np.array(["tab:blue", "tab:red"])  # 0 -> blue, 1 -> red
+
+    #     for idx, fname in enumerate(feature_names):
+    #         r = idx // n_cols
+    #         c = idx % n_cols
+    #         ax = axes[r, c]
+
+    #         x_raw = Xdf_test[fname].to_numpy()
+    #         mask = np.isfinite(x_raw) & np.isfinite(p_te_1d)
+    #         if mask.sum() < 5 or np.nanmin(x_raw[mask]) == np.nanmax(x_raw[mask]):
+    #             ax.set_title(f"{fname} (insufficient spread)")
+    #             ax.axis("off")
+    #             continue
+
+    #         x = x_raw[mask]
+    #         y_prob = p_te_1d[mask]
+    #         y_lab  = y_te_1d[mask]
+
+    #         # scatter, colored by true label
+    #         ax.scatter(x, y_prob, s=12, alpha=0.6, c=colors[y_lab], edgecolors="none")
+
+    #         # binned mean line
+    #         bins = np.linspace(x.min(), x.max(), nbins + 1)
+    #         bin_ids = np.digitize(x, bins)  # 1..nbins+1
+    #         bin_centers = 0.5 * (bins[:-1] + bins[1:])
+    #         bin_means = []
+    #         for k in range(1, nbins + 1):
+    #             sel = (bin_ids == k)
+    #             bin_means.append(np.nan if sel.sum() == 0 else float(y_prob[sel].mean()))
+    #         ax.plot(bin_centers, bin_means, linewidth=2)
+
+    #         ax.set_ylim(y_min, y_max)
+    #         ax.set_xlabel(f"{fname} (raw)")
+    #         ax.set_ylabel("P(class=1)")
+
+    #         # add a tiny legend on the first subplot only
+    #         if idx == 0:
+    #             from matplotlib.lines import Line2D
+    #             legend_elems = [
+    #                 Line2D([0], [0], marker='o', color='w', label='True 0',
+    #                        markerfacecolor='tab:blue', markersize=6),
+    #                 Line2D([0], [0], marker='o', color='w', label='True 1',
+    #                        markerfacecolor='tab:red', markersize=6)
+    #             ]
+    #             ax.legend(handles=legend_elems, loc="lower right", frameon=True)
+
+    #     # turn off any empty axes
+    #     for j in range(n_feats, n_rows * n_cols):
+    #         r = j // n_cols
+    #         c = j % n_cols
+    #         axes[r, c].axis("off")
+
+    #     plt.tight_layout(rect=[0, 0, 1, 0.98])
+    #     plt.show()
+        
+    # ---- ONE BIG FIGURE: Raw feature vs TRUE label (0/1), one subplot per feature
     feature_names = Xdf_test.columns.tolist()
 
     # ensure arrays are 1-D
-    p_te_1d = np.asarray(p_te, dtype=np.float32).ravel()
     y_te_1d = np.asarray(y_te_1d, dtype=np.int64).ravel()
 
     n_feats = len(feature_names)
@@ -244,17 +321,19 @@ def main():
         print("No features to plot.")
     else:
         # grid layout
-        n_cols = 4  # tweak if you want fewer/more columns
+        n_cols = 4  # tweak columns if you like
         n_rows = int(np.ceil(n_feats / n_cols))
 
-        fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.5 * n_cols, 3.3 * n_rows), squeeze=False)
-        fig.suptitle("P(class=1) vs Raw Test Features", y=0.995, fontsize=14)
+        fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.5 * n_cols, 3.0 * n_rows), squeeze=False)
+        fig.suptitle("Raw Feature Value vs True Label (0/1)", y=0.995, fontsize=14)
 
         # shared settings
-        nbins = 20
-        y_min, y_max = -0.05, 1.05
+        y_min, y_max = -0.3, 1.3
+        jitter = 0.06  # vertical jitter so overlapping 0/1 points are visible
+        point_size = 14
+        alpha = 0.6
 
-        # colors for labels (keep simple)
+        # simple color mapping by true label
         colors = np.array(["tab:blue", "tab:red"])  # 0 -> blue, 1 -> red
 
         for idx, fname in enumerate(feature_names):
@@ -263,43 +342,39 @@ def main():
             ax = axes[r, c]
 
             x_raw = Xdf_test[fname].to_numpy()
-            mask = np.isfinite(x_raw) & np.isfinite(p_te_1d)
-            if mask.sum() < 5 or np.nanmin(x_raw[mask]) == np.nanmax(x_raw[mask]):
+            # keep rows where both x and y are finite
+            mask = np.isfinite(x_raw) & np.isfinite(y_te_1d)
+            x = x_raw[mask]
+            y = y_te_1d[mask]
+
+            if x.size < 5 or np.nanmin(x) == np.nanmax(x):
                 ax.set_title(f"{fname} (insufficient spread)")
                 ax.axis("off")
                 continue
 
-            x = x_raw[mask]
-            y_prob = p_te_1d[mask]
-            y_lab  = y_te_1d[mask]
+            # add a tiny vertical jitter around 0 or 1 so points don't sit on a line
+            rng = np.random.default_rng(42 + idx)
+            y_j = y + rng.uniform(-jitter, jitter, size=y.shape)
 
-            # scatter, colored by true label
-            ax.scatter(x, y_prob, s=12, alpha=0.6, c=colors[y_lab], edgecolors="none")
-
-            # binned mean line
-            bins = np.linspace(x.min(), x.max(), nbins + 1)
-            bin_ids = np.digitize(x, bins)  # 1..nbins+1
-            bin_centers = 0.5 * (bins[:-1] + bins[1:])
-            bin_means = []
-            for k in range(1, nbins + 1):
-                sel = (bin_ids == k)
-                bin_means.append(np.nan if sel.sum() == 0 else float(y_prob[sel].mean()))
-            ax.plot(bin_centers, bin_means, linewidth=2)
+            # scatter each point; color by its true label
+            ax.scatter(x, y_j, s=point_size, alpha=alpha, c=colors[y], edgecolors="none")
 
             ax.set_ylim(y_min, y_max)
+            ax.set_yticks([0, 1])
             ax.set_xlabel(f"{fname} (raw)")
-            ax.set_ylabel("P(class=1)")
+            ax.set_ylabel("True label (0/1)")
+            ax.grid(axis="y", linestyle="--", linewidth=0.5, alpha=0.5)
 
-            # add a tiny legend on the first subplot only
             if idx == 0:
+                # tiny legend once
                 from matplotlib.lines import Line2D
                 legend_elems = [
-                    Line2D([0], [0], marker='o', color='w', label='True 0',
-                           markerfacecolor='tab:blue', markersize=6),
-                    Line2D([0], [0], marker='o', color='w', label='True 1',
-                           markerfacecolor='tab:red', markersize=6)
+                    Line2D([0], [0], marker='o', color='w', label='Label 0',
+                        markerfacecolor='tab:blue', markersize=6),
+                    Line2D([0], [0], marker='o', color='w', label='Label 1',
+                        markerfacecolor='tab:red', markersize=6)
                 ]
-                ax.legend(handles=legend_elems, loc="lower right", frameon=True)
+                ax.legend(handles=legend_elems, loc="upper right", frameon=True)
 
         # turn off any empty axes
         for j in range(n_feats, n_rows * n_cols):
