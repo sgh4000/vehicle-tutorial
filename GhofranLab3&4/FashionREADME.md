@@ -86,7 +86,7 @@ Overall, these results suggest the Fashion-MNIST model is robust and confident a
 | 0.10 | ✗ Falsified | A counterexample exists within ε=0.10 — larger allowed changes flip the label. | Marabou returned a specific perturbation (values around ±0.1). |
 | 0.50 | ✗ Falsified | A counterexample exists within ε=0.50 — very large changes easily flip the label. | Marabou returned a specific perturbation (values around ±0.5). |
 
-**Interpretation:** robustness holds for tiny noise (ε=0.01), but breaks once the  per-pixel change grows beyond ε≥0.05. It's important to note that I've got the same results for the rest of images (1-4) when testing the classification robustness across the same various values of ε used for Image0.
+**Interpretation:** robustness holds for tiny noise (ε=0.01), but breaks once the  per-pixel change grows beyond ε ≥ 0.05. It's important to note that I've got the same results for the rest of images (1-4) when testing the classification robustness across the same various values of ε used for Image0.
 
 **Overall Conclusion:** 
 
