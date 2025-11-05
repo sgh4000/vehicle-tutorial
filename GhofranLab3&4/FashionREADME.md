@@ -52,3 +52,19 @@ vehicle verify \
   --property robustL2 \
   --verifier Marabou
 ```
+
+### Verification Results  
+
+| **Image** | **Property Tested** | **Type of Robustness** | **Result** | **Meaning of Result** |
+|:-----------|:-------------------:|:-----------------------:|:------------:|:----------------------|
+| Image 0 | `robust` | **Classification Robustness (L∞)** | ✅ Marabou proved no counterexample exists | The model keeps the same label even when pixels change slightly within ε (0.005). |
+| Image 0 | `robustStrong` | **Strong Classification Robustness (L∞)** | ✅ Marabou proved no counterexample exists | The model keeps the same label **and** confidence above η (0.1). |
+| Image 0 | `robustL2` | **Classification Robustness (L2)** | ✅ Marabou proved no counterexample exists | The model stays stable for small pixel changes measured by Euclidean (L2) distance. |
+| Image 1 | _same 3 properties_ | _(same as above)_ | ✅ Verified for all | Predictions stayed consistent under small perturbations. |
+| Image 2 | _same 3 properties_ | _(same as above)_ | ✅ Verified for all | Predictions didn’t change under small pixel shifts. |
+| Image 3 | _same 3 properties_ | _(same as above)_ | ✅ Verified for all | Classifier remained robust and confident. |
+| Image 4 | _same 3 properties_ | _(same as above)_ | ✅ Verified for all | Network proved stable and reliable for minor input changes. |
+
+
+
+
