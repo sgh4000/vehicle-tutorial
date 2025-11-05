@@ -192,4 +192,19 @@ vehicle verify \
   --property robustL2 \
   --verifier Marabou
 ```
+After running:
+```bash
+Verifying properties:
+  robustL2!0 [=====================================================] 9/9 queries
+    result: 🗸 - Marabou proved no counterexample exists
+  robustL2!1 [=====================================================] 9/9 queries
+    result: 🗸 - Marabou proved no counterexample exists
+robustL2:
+    verified:  2/2
+    falsified: 0/2
+    timed-out: 0/2
+    errored:   0/2
+```
+**Meaning:** The network is L2-robust for both images, which means that when small pixel changes (within a total Euclidean distance of ε₂ = 0.1) were applied, the model kept predicting the same label, so the model remained stable and reliable under small L2 perturbations.
+
 
