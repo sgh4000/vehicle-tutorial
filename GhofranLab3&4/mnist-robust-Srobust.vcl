@@ -29,7 +29,7 @@ advises : Image -> Label -> Bool
 advises x i = forall j . j != i => classifier x ! i > classifier x ! j
 
 --------------------------------------------------------------------------------
--- Standard Robustness around a point (L∞ distance)
+-- Classification Robustness around a point (L∞ distance)
 
 -- First we define the parameter `epsilon` that will represent the radius of the
 -- ball that we want the network to be robust in. Note that we declare this as
@@ -44,7 +44,7 @@ epsilon : Real
 boundedByEpsilon : Image -> Bool
 boundedByEpsilon x = forall i j . -epsilon <= x ! i ! j <= epsilon
 
--- Standard robustness: for any small perturbation, if the perturbed image is valid,
+-- Classification robustness: for any small perturbation, if the perturbed image is valid,
 -- the classifier's predicted label for the perturbed image remains the same.
 -- We now define what it means for the network to be robust around an image `x`
 -- that should be classified as `y`. Namely, that for any perturbation no greater
@@ -67,7 +67,7 @@ eta : Real
 aboveEta : Image -> Label -> Bool
 aboveEta x i = classifier x ! i > eta
 
--- Strong robustness: after a small change (within epsilon),
+-- Strong Classification robustness: after a small change (within epsilon),
 -- the model keeps a confidence higher than eta.
 robustAroundStrong : Image -> Label -> Bool
 robustAroundStrong image label = forall pertubation .
@@ -76,7 +76,7 @@ robustAroundStrong image label = forall pertubation .
     aboveEta perturbedImage label
 
 --------------------------------------------------------------------------------
--- Alternative robustness using Euclidean distance (L2 distance)
+-- Classification robustness using Euclidean distance (L2 distance)
 
 -- The real L2 distance uses squares and square roots (non-linear), sum of squares <= epsilon2^2,
 -- but Marabou can only handle simple (linear) maths.
@@ -95,7 +95,7 @@ boundedByEpsilonL2 x =
   let epsInf = epsilon2 / 28.0 in
   forall i j . -epsInf <= x ! i ! j <= epsInf
 
--- Robustness using this L2 limit
+-- Classification Robustness using this L2 limit
 robustAround_L2 : Image -> Label -> Bool
 robustAround_L2 image label = forall pertubation .
   let perturbedImage = image - pertubation in
@@ -132,7 +132,7 @@ trainingImages : Vector Image n
 @dataset
 trainingLabels : Vector Label n
 
--- Vector of booleans: standard robustness result per image (L∞)
+-- Vector of booleans: Classification robustness result per image (L∞)
 -- We then say that the network is robust if it is robust around every pair
 -- of input images and output labels. Note the use of the `foreach`
 -- keyword when quantifying over the index `i` in the dataset. Whereas `forall`
@@ -145,12 +145,12 @@ trainingLabels : Vector Label n
 robust : Vector Bool n
 robust = foreach i . robustAround (trainingImages ! i) (trainingLabels ! i)
 
--- Vector of booleans: strong robustness result per image (L∞)
+-- Vector of booleans: strong Classification robustness result per image (L∞)
 @property
 robustStrong : Vector Bool n
 robustStrong = foreach i . robustAroundStrong (trainingImages ! i) (trainingLabels ! i)
 
--- Vector of booleans: standard robustness result per image (L2)
+-- Vector of booleans: Classification robustness result per image (L2)
 @property
 robustL2 : Vector Bool n
 robustL2 = foreach i . robustAround_L2 (trainingImages ! i) (trainingLabels ! i)

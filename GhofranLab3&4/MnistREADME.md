@@ -48,10 +48,10 @@ Note that the epsilon value can be changed, but the memory requirements of Marab
 
 # Results and inteprtations:
 
-## Standard Robustness (L∞ distance):
+## Classification Robustness (L∞ distance):
 
 The property we are checking:
-“If we make tiny changes (no bigger than epsilon) to each image, the network should still predict the same digit.”
+If we make tiny changes (no bigger than epsilon) to each image, the network should still predict the same digit.
 
 After running robustness verification for two MNIST images (the first two in the dataset):
 
@@ -131,8 +131,8 @@ robust:
 3. Conclusion: the network is robust for very small ε, but as ε grows, it becomes too complex for the solver because the model likely changes predictions more and the verification itself becomes computationally expensive.
 
 
-## Strong Robustness (L∞ distance):
-Strong Classification Robustness is similar to the normal robustness but here, we add an extra limit on the output score (the model’s confidence).
+## Strong Classification Robustness (L∞ distance):
+It is similar to the normal classification robustness but here, we add an extra limit on the output score (the model’s confidence).
 
 - **In normal robustness:** if we change the input image a little (within epsilon), the class label shouldn’t change.
 - **In strong robustness:** if we change the input image a little (within epsilon), the class label shouldn’t change and the output score (the confidence) for that class should stay above a small threshold η.
@@ -166,7 +166,7 @@ robustStrong:
 ```
 **Meaning:** For both images, no possible small change (within ε = 0.005) could make the network’s confidence in the correct label drop below η = 0.1.
 
-## Standard Robustness (L2 distance):
+## Classification Robustness (L2 distance):
 We already defined robustness using the L∞ distance (each pixel can change at most ε up or down).
 Now we redefine robustness using the Euclidean L2 distance (overall change in the whole image is ≤ ε).
 - **L∞:** Each pixel can move up to ±ε.
@@ -181,7 +181,7 @@ To pick ε₂:
 - Start small: 0.05 or 0.1.
 - Remember that per-pixel bound becomes epsilon2 / 28, if ε₂=0.1 --> per-pixel limit ≈ 0.00357.
 
-To run the Standard Robustness (L2) property:
+To run the Classification Robustness (L2) property:
 ```bash
 vehicle verify \
   --specification mnist-robust-Srobust.vcl \
