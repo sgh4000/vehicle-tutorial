@@ -177,8 +177,7 @@ True L2 uses squares and square-roots (non-linear), but Marabou only supports li
 If the image dimension is 28×28 = 784 pixels, then ensuring
 **|Δpixel| ≤ (ε₂ / √784) --> |Δpixel| ≤ (ε₂ / 28)** for every pixel guarantees that the L2 change ≤ ε₂.
 
-To on pick ε₂:
-
+To pick ε₂:
 - Start small: 0.05 or 0.1.
 - Remember that per-pixel bound becomes epsilon2 / 28, if ε₂=0.1 --> per-pixel limit ≈ 0.00357.
 
