@@ -68,6 +68,14 @@ After running the code we got for different definitions of robustness:
 | Image3 | _same 3 properties_ | _(same as above)_ | ✅ Verified for all | Classifier remained robust and confident. |
 | Image4 | _same 3 properties_ | _(same as above)_ | ✅ Verified for all | Network proved stable and reliable for minor input changes. |
 
+**Interpretation:** All five tested images showed the same results across the three robustness types.
+This means the model behaves consistently for these samples:
+- For Classification Robustness (L∞), the model’s predictions stayed the same even with very small pixel changes.
+- For Strong Classification Robustness (L∞), it also kept a good confidence level (above η = 0.1).
+- For Classification Robustness (L2), it remained stable when changes were measured using the Euclidean distance instead of the infinity norm.
+Overall, these results suggest the Fashion-MNIST model is robust and confident against small image noise for these images.
+
+
 Classification Robustness (L∞) for Image0 across four ε values:
 
 | **ε** | **Result** | **Meaning** | **Notes (from Marabou)** |
