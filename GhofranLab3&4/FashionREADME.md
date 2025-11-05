@@ -10,11 +10,11 @@ This verification experiment uses:
 - Datasets: Individual test samples, each .idx image file contains one 28×28 FMNIST image, and each label file contains its corresponding category.
 The larger combined dataset (like 0–49Images.idx and 0–49Labels.idx) caused memory issues when verified with Marabou, leading the process to be killed automatically.
 Because of that, each image was verified individually to ensure successful and stable verification runs.
- * Image0.idx, Label0.idx
- * Image1.idx, Label1.idx
- * Image2.idx, Label2.idx
- * Image3.idx, Label3.idx
- * Image4.idx, Label4.idx
+  * Image0.idx, Label0.idx
+  * Image1.idx, Label1.idx
+  * Image2.idx, Label2.idx
+  * Image3.idx, Label3.idx
+  * Image4.idx, Label4.idx
 
 
 Run commands (pick the property you want)
