@@ -77,8 +77,7 @@ This means the model behaves consistently for these samples:
 Overall, these results suggest the Fashion-MNIST model is robust and confident against small image noise for these images.
 
 
-
-Classification Robustness (L∞) for Image0 across four ε values:
+### Classification Robustness (L∞) for Image0 across four ε values:
 
 | **ε** | **Result** | **Meaning** | **Notes (from Marabou)** |
 |:------:|:------:|:--------|:---------------------|
