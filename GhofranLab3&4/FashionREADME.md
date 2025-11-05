@@ -17,9 +17,11 @@ Because of that, each image was verified individually (picked the first 5 images
   * Image4.idx, Label4.idx
 
 
-Run commands (pick the property you want)
+Run commands (pick the property you want):
 
-Classification Robustness (L∞):
+```bash
+# The same command was repeated for the other image–label pairs (Image0–Image4).
+# Classification Robustness (L∞):
 vehicle verify \
   --specification fashionRobustness.vcl \
   --network classifier:fashion1l32n.onnx \
@@ -29,7 +31,7 @@ vehicle verify \
   --property robust \
   --verifier Marabou
 
-Strong Classification Robustness (L∞):
+# Strong Classification Robustness (L∞):
 vehicle verify \
   --specification fashionRobustness.vcl \
   --network classifier:fashion1l32n.onnx \
@@ -40,7 +42,7 @@ vehicle verify \
   --property robustStrong \
   --verifier Marabou
 
-Classification Robustness (L2-style, conservative):
+# Classification Robustness (L2-style, conservative):
 vehicle verify \
   --specification fashionRobustness.vcl \
   --network classifier:fashion1l32n.onnx \
@@ -49,4 +51,4 @@ vehicle verify \
   --parameter epsilon2:0.1 \
   --property robustL2 \
   --verifier Marabou
-
+```
