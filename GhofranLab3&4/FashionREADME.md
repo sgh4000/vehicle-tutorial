@@ -5,11 +5,11 @@ Each image is labeled with one of ten fashion classes (0–9).
 
 This verification experiment uses:
 
-- Specification file: fashionRobustness.vcl
-- Neural network model: fashion1l32n.onnx
-- Datasets: Individual test samples, each .idx image file contains one 28×28 FMNIST image, and each label file contains its corresponding category.
+- **Specification file:** fashionRobustness.vcl
+- **Neural network model:** fashion1l32n.onnx
+- **Datasets:** Individual test samples, each .idx image file contains one 28×28 FMNIST image, and each label file contains its corresponding category.
 The larger combined dataset (like 0–49Images.idx and 0–49Labels.idx) caused memory issues when verified with Marabou, leading the process to be killed automatically.
-Because of that, each image was verified individually to ensure successful and stable verification runs.
+Because of that, each image was verified individually (picked the first 5 images) to ensure successful and stable verification runs.
   * Image0.idx, Label0.idx
   * Image1.idx, Label1.idx
   * Image2.idx, Label2.idx
