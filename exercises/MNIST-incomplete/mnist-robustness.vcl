@@ -27,7 +27,8 @@ classifier : Image -> Tensor Real [10]
 -- for label `i` is greater than the score of any other label `j`.
 
 advises : Image -> Label -> Bool
-advises x i = forall j . j != i => classifier x ! i > classifier x ! j
+advises x i = 
+  forall j . j != i => classifier x ! i > classifier x ! j
 
 eta : Real
 eta = 0.8
