@@ -11,6 +11,16 @@ vehicle \
   --parameter eta:0.005 \
   --property robustRegular
 
+<<com
+
+robustRegular:
+    verified:  84/100
+    falsified: 16/100
+    timed-out: 0/100
+    errored:   0/100
+
+com
+
 vehicle \
   verify \
   --specification fmnist-own-solution.vcl \
@@ -21,3 +31,121 @@ vehicle \
   --parameter epsilon:0.005 \
   --parameter eta:0.005 \
   --property strongClassificationRobust
+
+<<com 
+
+strongClassificationRobust:
+    verified:  84/100
+    falsified: 16/100
+    timed-out: 0/100
+    errored:   0/100
+
+
+com
+
+
+vehicle \
+  verify \
+  --specification fmnist-own-solution.vcl \
+  --verifier Marabou \
+  --network fashionMnist:fashion1l32n.onnx \
+  --dataset trainingImages:idxdata/0-99Images.idx \
+  --dataset trainingLabels:idxdata/0-99Labels.idx \
+  --parameter epsilon:0.005 \
+  --parameter eta:0.1 \
+  --property strongClassificationRobust
+
+<<com
+
+strongClassificationRobust:
+    verified:  83/100
+    falsified: 17/100
+    timed-out: 0/100
+    errored:   0/100
+
+com
+
+vehicle \
+  verify \
+  --specification fmnist-own-solution.vcl \
+  --verifier Marabou \
+  --network fashionMnist:fashion1l32n.onnx \
+  --dataset trainingImages:idxdata/0-99Images.idx \
+  --dataset trainingLabels:idxdata/0-99Labels.idx \
+  --parameter epsilon:0.005 \
+  --parameter eta:0.2 \
+  --property strongClassificationRobust
+
+<<com
+
+strongClassificationRobust:
+    verified:  83/100
+    falsified: 17/100
+    timed-out: 0/100
+    errored:   0/100
+
+
+com
+
+vehicle \
+  verify \
+  --specification fmnist-own-solution.vcl \
+  --verifier Marabou \
+  --network fashionMnist:fashion1l32n.onnx \
+  --dataset trainingImages:idxdata/0-99Images.idx \
+  --dataset trainingLabels:idxdata/0-99Labels.idx \
+  --parameter epsilon:0.005 \
+  --parameter eta:0.5 \
+  --property strongClassificationRobust
+
+<<com
+
+  strongClassificationRobust:
+    verified:  80/100
+    falsified: 20/100
+    timed-out: 0/100
+    errored:   0/100
+
+com
+
+vehicle \
+  verify \
+  --specification fmnist-own-solution.vcl \
+  --verifier Marabou \
+  --network fashionMnist:fashion1l32n.onnx \
+  --dataset trainingImages:idxdata/0-99Images.idx \
+  --dataset trainingLabels:idxdata/0-99Labels.idx \
+  --parameter epsilon:0.005 \
+  --parameter eta:0.7 \
+  --property strongClassificationRobust
+
+<<com
+
+strongClassificationRobust:
+    verified:  78/100
+    falsified: 22/100
+    timed-out: 0/100
+    errored:   0/100
+
+com
+
+vehicle \
+  verify \
+  --specification fmnist-own-solution.vcl \
+  --verifier Marabou \
+  --network fashionMnist:fashion1l32n.onnx \
+  --dataset trainingImages:idxdata/0-99Images.idx \
+  --dataset trainingLabels:idxdata/0-99Labels.idx \
+  --parameter epsilon:0.005 \
+  --parameter eta:0.8 \
+  --property strongClassificationRobust
+
+<<com
+
+  strongClassificationRobust:
+    verified:  77/100
+    falsified: 23/100
+    timed-out: 0/100
+    errored:   0/100
+
+com
