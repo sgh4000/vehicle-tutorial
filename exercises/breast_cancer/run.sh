@@ -7,5 +7,7 @@ vehicle verify \
     --verifier Marabou \
     --property property0 \
     --property property1 \
-    --property property2
+    --property property2 \
+    --property property3 \
+    --property property4
 
