@@ -82,7 +82,7 @@ trainingImages : Vector Image n
 trainingLabels : Vector Label n
 
 ----------------------------------------------------------------------------------
--- property 1
+-- property 1 (CR (Classification Robustness))
 
 -- We then say that the network is robust if it is robust around every pair
 -- of input images and output labels. Note the use of the `foreach`
@@ -98,16 +98,17 @@ property1 : Vector Bool n
 property1 = foreach i . robustAround (trainingImages ! i) (trainingLabels ! i) -- [your answer here]
 
 ----------------------------------------------------------------------------------
--- property 2
+-- property 2 (SCR (Strong Classification Robustness))
 
 -- Strong Classification Robustness in Vehicle
--- |x_hat - x| <= epsilon ------> f(x) <= etha
+-- |x_hat - x| <= epsilon ------> f(x) >= etha
 
-etha = 0.0001
+etha = 20
 
-xHatMinusXLessThanEpsilon : Image -> Label -> Bool
-xHatMinusXLessThanEpsilon image label = forall perturbation . 
+xHatMinusXLessThanEpsilon_SCR : Image -> Label -> Bool
+xHatMinusXLessThanEpsilon_SCR image label = forall perturbation . 
   let perturbedImage = image - perturbation in
+  validImage image and
   boundedByEpsilon perturbation and 
   validImage perturbedImage
   => classifier perturbedImage ! label >= etha
@@ -115,11 +116,61 @@ xHatMinusXLessThanEpsilon image label = forall perturbation .
 @property
 property2 : Bool
 property2 = forall i . 
-  xHatMinusXLessThanEpsilon (trainingImages ! i) (trainingLabels ! i)
+  xHatMinusXLessThanEpsilon_SCR (trainingImages ! i) (trainingLabels ! i)   
 
 ----------------------------------------------------------------------------------
--- property 3
+-- property 3  SR (Standard Robustness)
 
 -- Strong Classification Robustness in Vehicle
--- |x_hat - x| <= epsilon ------> f(x) <= etha
+-- |x_hat - x| <= epsilon ------> abs(f(x) - f(x_hat)) <= theta
+
+delta = 0.01
+
+xHatMinusXLessThanEpsilon_SR : Image -> Label -> Bool
+xHatMinusXLessThanEpsilon_SR image label = forall perturbation . 
+  let perturbedImage = image - perturbation in
+  validImage image and
+  boundedByEpsilon perturbation and 
+  validImage perturbedImage
+  => -delta <= ((classifier perturbedImage ! label) - (classifier image ! label)) <= delta
+
+@property
+property3 : Bool
+property3 = forall i . 
+  xHatMinusXLessThanEpsilon_SR (trainingImages ! i) (trainingLabels ! i)  
+
+
+
+----------------------------------------------------------------------------------
+-- property 4  (LR (Lipschitz Robustness))
+
+-- Strong Classification Robustness in Vehicle
+-- |x_hat - x| <= epsilon ------> abs(f(x) - f(x_hat)) <= L(x - x_hat)
+
+euclideanSquared : Image -> Image -> Real
+euclideanSquared x y =
+  let d = x - y in
+  let sum = 0 in
+  let sum = sum + ((d ! 0 ! 0) * (d ! 0 ! 0)) in
+  let sum = sum + ((d ! 0 ! 1) * (d ! 0 ! 1)) in
+  sum
+
+lipschitzL : Real
+lipschitzL = 1.0  -- <-- fill bound
+
+lipschitzBound : Image -> Image -> Real
+lipschitzBound x xhat = lipschitzL * euclideanSquared x xhat
+
+xHatMinusXLessThanEpsilon_LR : Image -> Label -> Bool
+xHatMinusXLessThanEpsilon_LR image label = forall perturbation . 
+  let perturbedImage = image - perturbation in
+  validImage image and
+  boundedByEpsilon perturbation and 
+  validImage perturbedImage  
+  => -(lipschitzBound image perturbedImage) <= ((classifier perturbedImage ! label) - (classifier image ! label)) <= (lipschitzBound image perturbedImage)
+
+@property
+property4 : Bool
+property4 = forall i . 
+  xHatMinusXLessThanEpsilon_LR (trainingImages ! i) (trainingLabels ! i)  
 
