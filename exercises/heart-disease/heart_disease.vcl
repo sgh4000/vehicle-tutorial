@@ -121,7 +121,7 @@ youngNormalVitals x =
   x ! age_years <= 40 and
   x ! serum_chol <= 120 and
   x ! st_depression == 0 and
-  x ! max_heart_rate >= 210 and
+  x ! max_heart_rate >= 190 and
   x ! chest_pain_atypical_angina == 0 and
   x ! chest_pain_non_anginal == 0 and
   x ! chest_pain_asymptomatic == 0 and
@@ -148,7 +148,7 @@ healthySenior x =
   x ! is_male == 0 and
   x ! serum_chol <= 120 and
   x ! st_depression == 0 and
-  x ! max_heart_rate >= 210 and
+  x ! max_heart_rate >= 160 and
   x ! chest_pain_atypical_angina == 0 and
   x ! chest_pain_non_anginal == 0 and
   x ! chest_pain_asymptomatic == 0 and
@@ -172,7 +172,7 @@ property4 = forall y .
 highCholesterol : UnnormalisedInput -> Bool
 highCholesterol x = 
   x ! serum_chol >= 350 and
-  (x ! max_heart_rate <= 80)
+  (x ! max_heart_rate <= 60)
 
 @property
 property5 : Bool
