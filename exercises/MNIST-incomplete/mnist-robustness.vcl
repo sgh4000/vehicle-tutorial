@@ -1,6 +1,5 @@
 --------------------------------------------------------------------------------
 -- Inputs and outputs
--- vehicle verify   --specification mnist-robustness.vcl   --network classifier:mnist-classifier.onnx   --parameter epsilon:0.005   --dataset trainingImages:500-images.idx   --dataset trainingLabels:500-labels.idx   --verifier Marabou --property property1
 
 -- Define the type for our input images. Note that the input is two-dimensional
 
