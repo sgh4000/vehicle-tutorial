@@ -1,8 +1,6 @@
 --------------------------------------------------------------------------------
 -- Notes to be considered
 
--- vehicle verify   --specification iris-possible-answers.vcl   --network iris:iris_model.onnx  --verifier Marabou  --property property8
-
 -- It's not working with this function. The only difference is the virginica score, which I gave it to the function
 -- isVirginica : Input -> Bool
 -- isVirginica x =
