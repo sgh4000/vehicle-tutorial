@@ -21,6 +21,10 @@ eta : Real
 maximalScore : Image -> Label -> Bool
 maximalScore image label = forall j . j != label => fashionMnist image ! label > fashionMnist image ! j
 
+strongAdvises : Image -> Label -> Bool
+strongAdvises x i =
+  fashionMnist x ! i >= eta
+
 stronglyMaximalScore : Image -> Label -> Bool
 stronglyMaximalScore x i =
   forall j . j != i => fashionMnist x ! i >= fashionMnist x ! j + eta
@@ -39,6 +43,12 @@ robustAround image label = forall pertubation .
 
 strongClassificationRobustAround : Image -> Label -> Bool
 strongClassificationRobustAround image label = forall pertubation .
+  let perturbedImage = image - pertubation in
+  boundedByEpsilon pertubation and validImage perturbedImage =>
+    strongAdvises perturbedImage label
+
+stronglyMaximalAround : Image -> Label -> Bool
+stronglyMaximalAround image label = forall pertubation .
   let perturbedImage = image - pertubation in
   boundedByEpsilon pertubation and validImage perturbedImage =>
     stronglyMaximalScore perturbedImage label
@@ -60,4 +70,9 @@ robustRegular = foreach i . robustAround (trainingImages ! i) (trainingLabels ! 
 @property
 strongClassificationRobust : Vector Bool n
 strongClassificationRobust = foreach i . strongClassificationRobustAround (trainingImages ! i) (trainingLabels ! i)
+
+@property
+stronglyMaximal : Vector Bool n
+stronglyMaximal = foreach i . stronglyMaximalAround (trainingImages ! i) (trainingLabels ! i)
+
 
