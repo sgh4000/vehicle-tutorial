@@ -7,4 +7,4 @@ vehicle verify  \
     --dataset trainingImages:t2-images.idx  \
     --dataset trainingLabels:t2-labels.idx   \
     --verifier Marabou \
-    --property property1
+    --property property3

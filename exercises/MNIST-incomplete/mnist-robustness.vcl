@@ -102,7 +102,7 @@ property1 = foreach i . robustAround (trainingImages ! i) (trainingLabels ! i) -
 -- Strong Classification Robustness in Vehicle
 -- |x_hat - x| <= epsilon ------> f(x) >= etha
 
-etha = 20
+etha = 0.1
 
 xHatMinusXLessThanEpsilon_SCR : Image -> Label -> Bool
 xHatMinusXLessThanEpsilon_SCR image label = forall perturbation . 

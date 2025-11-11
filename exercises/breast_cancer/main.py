@@ -231,80 +231,231 @@ def main():
     plt.tight_layout()
     plt.show()
         
-    # ---- ONE BIG FIGURE: Raw feature vs TRUE label (0/1), one subplot per feature
-    feature_names = Xdf_test.columns.tolist()
+    # ==== EXPLAINABLE FEATURE VIEWS (no seaborn) ============================================
+    # Goal: find which raw features separate labels, and visualize their ranges clearly.
 
-    # ensure arrays are 1-D
+    import math
+    from sklearn.metrics import roc_auc_score
+
+    # Ensure 1-D labels
     y_te_1d = np.asarray(y_te_1d, dtype=np.int64).ravel()
 
-    n_feats = len(feature_names)
-    if n_feats == 0:
-        print("No features to plot.")
+    # Work with the same test split as before, but keep only finite rows
+    X_test_raw = Xdf_test.copy()
+    mask_rows = np.isfinite(y_te_1d)
+    for col in X_test_raw.columns:
+        mask_rows &= np.isfinite(pd.to_numeric(X_test_raw[col], errors="coerce").to_numpy())
+    X_test_raw = X_test_raw.loc[mask_rows]
+    y_test_masked = y_te_1d[mask_rows]
+
+    if X_test_raw.shape[0] < 10:
+        print("Not enough valid test samples for feature visualizations.")
     else:
-        # grid layout
-        n_cols = 4  # tweak columns if you like
-        n_rows = int(np.ceil(n_feats / n_cols))
+        # ---------- 1) RANK FEATURES: ROC AUC + Cohen's d ----------
+        def cohen_d(x0, x1):
+            # pooled std
+            n0, n1 = len(x0), len(x1)
+            if n0 < 2 or n1 < 2:
+                return np.nan
+            s0 = np.nanvar(x0, ddof=1)
+            s1 = np.nanvar(x1, ddof=1)
+            if s0 + s1 == 0:
+                return 0.0
+            sp = np.sqrt(((n0 - 1)*s0 + (n1 - 1)*s1) / (n0 + n1 - 2))
+            if sp == 0:
+                return 0.0
+            return (np.nanmean(x1) - np.nanmean(x0)) / sp
 
-        fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.5 * n_cols, 3.0 * n_rows), squeeze=False)
-        fig.suptitle("Raw Feature Value vs True Label (0/1)", y=0.995, fontsize=14)
-
-        # shared settings
-        y_min, y_max = -0.3, 1.3
-        jitter = 0.06  # vertical jitter so overlapping 0/1 points are visible
-        point_size = 14
-        alpha = 0.6
-
-        # simple color mapping by true label
-        colors = np.array(["tab:blue", "tab:red"])  # 0 -> blue, 1 -> red
-
-        for idx, fname in enumerate(feature_names):
-            r = idx // n_cols
-            c = idx % n_cols
-            ax = axes[r, c]
-
-            x_raw = Xdf_test[fname].to_numpy()
-            # keep rows where both x and y are finite
-            mask = np.isfinite(x_raw) & np.isfinite(y_te_1d)
-            x = x_raw[mask]
-            y = y_te_1d[mask]
-
-            if x.size < 5 or np.nanmin(x) == np.nanmax(x):
-                ax.set_title(f"{fname} (insufficient spread)")
-                ax.axis("off")
+        ranks = []
+        y = y_test_masked.astype(int)
+        for feat in X_test_raw.columns:
+            x = pd.to_numeric(X_test_raw[feat], errors="coerce").to_numpy()
+            ok = np.isfinite(x) & np.isfinite(y)
+            if ok.sum() < 10:
                 continue
+            # AUC: higher means better separation (1.0 = perfect)
+            try:
+                auc = roc_auc_score(y[ok], x[ok])
+                auc = max(auc, 1 - auc)  # make direction-agnostic (>= 0.5)
+            except Exception:
+                auc = np.nan
+            # Cohen's d (directional); use abs for ranking
+            d = cohen_d(x[ok][y[ok] == 0], x[ok][y[ok] == 1])
+            ranks.append((feat, auc, d))
 
-            # add a tiny vertical jitter around 0 or 1 so points don't sit on a line
-            rng = np.random.default_rng(42 + idx)
-            y_j = y + rng.uniform(-jitter, jitter, size=y.shape)
+        rank_df = pd.DataFrame(ranks, columns=["feature", "auc", "cohen_d"]).dropna()
+        if len(rank_df) == 0:
+            print("No numeric features to rank.")
+        else:
+            # sort by AUC primarily, then |d|
+            rank_df["abs_d"] = rank_df["cohen_d"].abs()
+            rank_df = rank_df.sort_values(["auc", "abs_d"], ascending=[False, False]).reset_index(drop=True)
 
-            # scatter each point; color by its true label
-            ax.scatter(x, y_j, s=point_size, alpha=alpha, c=colors[y], edgecolors="none")
+            # Print top features (text)
+            print("\nTop 15 features by separability (test set):")
+            print(rank_df.head(15).to_string(index=False, float_format=lambda v: f"{v:0.3f}"))
 
-            ax.set_ylim(y_min, y_max)
-            ax.set_yticks([0, 1])
-            ax.set_xlabel(f"{fname} (raw)")
-            ax.set_ylabel("True label (0/1)")
-            ax.grid(axis="y", linestyle="--", linewidth=0.5, alpha=0.5)
+            # ---------- 2) VISUALIZE DISTRIBUTIONS FOR TOP-K FEATURES ----------
+            top_k = min(12, len(rank_df))
+            top_feats = rank_df["feature"].head(top_k).tolist()
 
-            if idx == 0:
-                # tiny legend once
-                from matplotlib.lines import Line2D
-                legend_elems = [
-                    Line2D([0], [0], marker='o', color='w', label='Label 0',
-                        markerfacecolor='tab:blue', markersize=6),
-                    Line2D([0], [0], marker='o', color='w', label='Label 1',
-                        markerfacecolor='tab:red', markersize=6)
-                ]
-                ax.legend(handles=legend_elems, loc="upper right", frameon=True)
+            # Helper: plot overlaid, normalized histograms + medians
+            n_cols = 3
+            n_rows = math.ceil(top_k / n_cols)
+            fig, axes = plt.subplots(n_rows, n_cols, figsize=(5.2 * n_cols, 3.6 * n_rows), squeeze=False)
+            fig.suptitle("Top features — distributions by label (normalized histograms + medians)", y=0.995, fontsize=14)
 
-        # turn off any empty axes
-        for j in range(n_feats, n_rows * n_cols):
-            r = j // n_cols
-            c = j % n_cols
-            axes[r, c].axis("off")
+            for i, feat in enumerate(top_feats):
+                r, c = divmod(i, n_cols)
+                ax = axes[r, c]
+                x = pd.to_numeric(X_test_raw[feat], errors="coerce").to_numpy()
+                x0 = x[y == 0]
+                x1 = x[y == 1]
 
-        plt.tight_layout(rect=[0, 0, 1, 0.98])
-        plt.show()
+                # Auto bins using combined data
+                combined = np.concatenate([x0, x1])
+                finite = np.isfinite(combined)
+                if finite.sum() < 10 or np.nanmin(combined[finite]) == np.nanmax(combined[finite]):
+                    ax.set_title(f"{feat}\n(insufficient spread)")
+                    ax.axis("off")
+                    continue
+
+                bins = min(30, max(10, int(np.sqrt(finite.sum()))))
+                # Overlaid, density=True to compare shapes
+                ax.hist(x0, bins=bins, density=True, alpha=0.55, label="Label 0")
+                ax.hist(x1, bins=bins, density=True, alpha=0.55, label="Label 1")
+
+                # Medians
+                med0 = np.nanmedian(x0[np.isfinite(x0)]) if np.isfinite(x0).any() else np.nan
+                med1 = np.nanmedian(x1[np.isfinite(x1)]) if np.isfinite(x1).any() else np.nan
+                if np.isfinite(med0): ax.axvline(med0, linestyle="--", linewidth=1.2, label="Median 0")
+                if np.isfinite(med1): ax.axvline(med1, linestyle="-.", linewidth=1.2, label="Median 1")
+
+                # Title with quick stats
+                auc_val = rank_df.loc[rank_df["feature"] == feat, "auc"].values[0]
+                d_val   = rank_df.loc[rank_df["feature"] == feat, "cohen_d"].values[0]
+                # ax.set_title(f"{feat}\nAUC={auc_val:0.3f} | d={d_val:0.2f}")
+                ax.set_ylabel("Density")
+                ax.set_xlabel("Raw value")
+                ax.grid(alpha=0.3, linestyle="--", linewidth=0.5)
+                if i == 0:
+                    ax.legend(frameon=True)
+
+            # hide any empty axes
+            for j in range(top_k, n_rows * n_cols):
+                r, c = divmod(j, n_cols)
+                axes[r, c].axis("off")
+
+            plt.tight_layout(rect=[0, 0, 1, 0.97])
+            plt.show()
+
+            # ---------- 3) OPTIONAL: BOXPLOTS side-by-side (robust to outliers) ----------
+            # Shows the same top features as compact paired boxplots for labels 0/1.
+            fig2, axes2 = plt.subplots(n_rows, n_cols, figsize=(5.2 * n_cols, 3.6 * n_rows), squeeze=False)
+            fig2.suptitle("Top features — boxplots by label (0 vs 1)", y=0.995, fontsize=14)
+
+            for i, feat in enumerate(top_feats):
+                r, c = divmod(i, n_cols)
+                ax = axes2[r, c]
+                x = pd.to_numeric(X_test_raw[feat], errors="coerce").to_numpy()
+                data0 = x[y == 0]
+                data1 = x[y == 1]
+                # Skip if not enough values
+                if np.isfinite(data0).sum() < 3 or np.isfinite(data1).sum() < 3:
+                    ax.set_title(f"{feat}\n(insufficient data)")
+                    ax.axis("off")
+                    continue
+                bp = ax.boxplot([data0[np.isfinite(data0)], data1[np.isfinite(data1)]],
+                                vert=True, patch_artist=True, labels=["0", "1"])
+                # Light styling
+                for patch in bp["boxes"]:
+                    patch.set_alpha(0.6)
+                ax.set_title(feat)
+                ax.set_ylabel("Raw value")
+                ax.grid(alpha=0.3, linestyle="--", linewidth=0.5)
+
+            for j in range(top_k, n_rows * n_cols):
+                r, c = divmod(j, n_cols)
+                axes2[r, c].axis("off")
+
+            plt.tight_layout(rect=[0, 0, 1, 0.97])
+            plt.show()
+
+
+    # # ---- ONE BIG FIGURE: Raw feature vs TRUE label (0/1), one subplot per feature
+    # feature_names = Xdf_test.columns.tolist()
+
+    # # ensure arrays are 1-D
+    # y_te_1d = np.asarray(y_te_1d, dtype=np.int64).ravel()
+
+    # n_feats = len(feature_names)
+    # if n_feats == 0:
+    #     print("No features to plot.")
+    # else:
+    #     # grid layout
+    #     n_cols = 4  # tweak columns if you like
+    #     n_rows = int(np.ceil(n_feats / n_cols))
+
+    #     fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.5 * n_cols, 3.0 * n_rows), squeeze=False)
+    #     fig.suptitle("Raw Feature Value vs True Label (0/1)", y=0.995, fontsize=14)
+
+    #     # shared settings
+    #     y_min, y_max = -0.3, 1.3
+    #     jitter = 0.06  # vertical jitter so overlapping 0/1 points are visible
+    #     point_size = 14
+    #     alpha = 0.6
+
+    #     # simple color mapping by true label
+    #     colors = np.array(["tab:blue", "tab:red"])  # 0 -> blue, 1 -> red
+
+    #     for idx, fname in enumerate(feature_names):
+    #         r = idx // n_cols
+    #         c = idx % n_cols
+    #         ax = axes[r, c]
+
+    #         x_raw = Xdf_test[fname].to_numpy()
+    #         # keep rows where both x and y are finite
+    #         mask = np.isfinite(x_raw) & np.isfinite(y_te_1d)
+    #         x = x_raw[mask]
+    #         y = y_te_1d[mask]
+
+    #         if x.size < 5 or np.nanmin(x) == np.nanmax(x):
+    #             ax.set_title(f"{fname} (insufficient spread)")
+    #             ax.axis("off")
+    #             continue
+
+    #         # add a tiny vertical jitter around 0 or 1 so points don't sit on a line
+    #         rng = np.random.default_rng(42 + idx)
+    #         y_j = y + rng.uniform(-jitter, jitter, size=y.shape)
+
+    #         # scatter each point; color by its true label
+    #         ax.scatter(x, y_j, s=point_size, alpha=alpha, c=colors[y], edgecolors="none")
+
+    #         ax.set_ylim(y_min, y_max)
+    #         ax.set_yticks([0, 1])
+    #         ax.set_xlabel(f"{fname} (raw)")
+    #         ax.set_ylabel("True label (0/1)")
+    #         ax.grid(axis="y", linestyle="--", linewidth=0.5, alpha=0.5)
+
+    #         if idx == 0:
+    #             # tiny legend once
+    #             from matplotlib.lines import Line2D
+    #             legend_elems = [
+    #                 Line2D([0], [0], marker='o', color='w', label='Label 0',
+    #                     markerfacecolor='tab:blue', markersize=6),
+    #                 Line2D([0], [0], marker='o', color='w', label='Label 1',
+    #                     markerfacecolor='tab:red', markersize=6)
+    #             ]
+    #             ax.legend(handles=legend_elems, loc="upper right", frameon=True)
+
+    #     # turn off any empty axes
+    #     for j in range(n_feats, n_rows * n_cols):
+    #         r = j // n_cols
+    #         c = j % n_cols
+    #         axes[r, c].axis("off")
+
+    #     plt.tight_layout(rect=[0, 0, 1, 0.98])
+    #     plt.show()
 
 
 if __name__ == "__main__":

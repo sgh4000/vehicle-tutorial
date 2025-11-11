@@ -90,10 +90,9 @@ property3 = forall x .
 property4 : Bool
 property4 = forall x . 
     validInput x and 
-    x ! Bl_cromatin == 1 and 
-    x ! Cell_size == 1 and
-    x ! Cell_shape == 1 and
-    x ! Epith_c_size == 1 and 
-    x ! Marg_adhesion == 1 and
-    x ! Epith_c_size == 2
+    x ! Bl_cromatin <= 2 and 
+    x ! Cell_size <= 2 and
+    x ! Cell_shape <= 2 and
+    x ! Epith_c_size <= 2 and 
+    x ! Marg_adhesion <= 2 
     => isMax NonCancer x
